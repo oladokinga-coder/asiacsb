@@ -1,0 +1,399 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #080c12;
+  --bg-card: #0e1319;
+  --bg-elevated: #161d26;
+  --bg-glass: rgba(14, 19, 25, 0.92);
+  --border: #252d38;
+  --border-subtle: rgba(255,255,255,0.08);
+  --text: #f0f6fc;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --accent: #00c896;
+  --accent-hover: #00e0a8;
+  --accent-glow: rgba(0, 200, 150, 0.3);
+  --danger: #ff4757;
+  --gold: #e6b84a;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.45);
+  --shadow-lg: 0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-glow: 0 0 60px rgba(0, 200, 150, 0.15);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05);
+  --section-padding: clamp(4rem, 8vw, 6rem);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, #00a87a 100%);
+  color: var(--bg);
+  box-shadow: 0 4px 20px rgba(0, 200, 150, 0.35);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
+  box-shadow: 0 6px 28px rgba(0, 200, 150, 0.45);
+}
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background: #222836;
+  border-color: var(--text-muted);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+}
+.btn-ghost:hover {
+  background: var(--bg-elevated);
+}
+
+/* Cards */
+.card {
+  background: linear-gradient(160deg, var(--bg-card) 0%, #0a0e12 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+/* Forms */
+.input-group {
+  margin-bottom: 16px;
+}
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+}
+.input-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,200,150,0.2);
+}
+.input-group input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+/* Bank card visual */
+.bank-card {
+  background: linear-gradient(135deg, #1e2a3a 0%, #0f1620 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  min-height: 200px;
+}
+.bank-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(0,200,150,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.bank-card .card-chip {
+  width: 44px;
+  height: 34px;
+  background: linear-gradient(135deg, #f0b429 0%, #d49820 100%);
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+.bank-card .card-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.35rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+.bank-card .card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.bank-card .card-logo {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+/* Premium sections */
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+/* Swipe / Carousel */
+.swipe-track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+.swipe-track::-webkit-scrollbar {
+  display: none;
+}
+.swipe-slide {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Hero carousel dots */
+.carousel-dots {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: width 0.3s, background 0.3s;
+}
+.carousel-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--accent);
+}
+.carousel-dot:hover {
+  background: var(--text-muted);
+}
+
+/* Premium card with image */
+.premium-card {
+  background: linear-gradient(160deg, var(--bg-card) 0%, #0a0e12 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s ease;
+}
+.premium-card:hover {
+  border-color: rgba(0, 200, 150, 0.4);
+  box-shadow: var(--shadow-glow), 0 20px 40px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+
+/* Gradient mesh for hero */
+.hero-mesh {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--accent-glow), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(230, 184, 74, 0.12), transparent 45%),
+    radial-gradient(ellipse 50% 30% at 0% 80%, rgba(0, 200, 150, 0.1), transparent 40%);
+}
+
+/* Subtle grid pattern for sections */
+.section-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.section-dots-strong {
+  background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Premium animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(6px, -4px); }
+  66% { transform: translate(-4px, 4px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+.shine-hover {
+  position: relative;
+  overflow: hidden;
+}
+.shine-hover::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  transition: left 0.5s ease;
+}
+.shine-hover:hover::after {
+  left: 100%;
+}
+
+/* Decorative gradient orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+.orb-teal { background: rgba(0, 200, 150, 0.25); }
+.orb-amber { background: rgba(230, 184, 74, 0.15); }
+.orb-blue { background: rgba(59, 130, 246, 0.15); }
+
+/* Cabinet page animations */
+.cabinet-stagger > * { opacity: 0; animation: fadeInUp 0.45s ease-out forwards; }
+.cabinet-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.cabinet-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.cabinet-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.cabinet-stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.cabinet-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.cabinet-stagger > *:nth-child(6) { animation-delay: 0.3s; }
+.cabinet-stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.cabinet-stagger > *:nth-child(8) { animation-delay: 0.4s; }
+.cabinet-stagger > *:nth-child(9) { animation-delay: 0.45s; }
+.cabinet-stagger > *:nth-child(10) { animation-delay: 0.5s; }
+
+@keyframes icon-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.premium-card:hover .icon-bounce-hover {
+  animation: icon-bounce 0.5s ease-in-out;
+}
+.card-hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow), 0 24px 48px rgba(0,0,0,0.25);
+}
+.image-zoom-hover {
+  transition: transform 0.6s ease;
+}
+.premium-card:hover .image-zoom-hover {
+  transform: scale(1.08);
+}
