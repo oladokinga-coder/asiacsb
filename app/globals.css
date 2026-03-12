@@ -196,9 +196,15 @@ input, select, textarea {
   position: absolute;
   top: 24px;
   right: 24px;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.bank-card .card-visa {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  color: var(--text-muted);
 }
 
 /* Premium sections */
