@@ -1,7 +1,7 @@
 /**
  * Работа с Google Таблицей.
  * Таблица должна содержать листы:
- * - "Клиенты": userId, email, fullName, balance, cardNumber, cardValid, cardCvv, passportSeries, passportNumber, birthDate, country, createdAt, beneficiary (опционально)
+ * - "Клиенты": userId, email, fullName, balance, cardNumber, cardValid, cardCvv, passportSeries, passportNumber, birthDate, country, createdAt, beneficiary, accountNumber (опционально)
  *   При регистрации заполняются: userId, email, fullName, passportSeries, passportNumber, birthDate, country, createdAt. Карта (cardNumber, cardValid, cardCvv) — вручную.
  * - "Транзакции": id, email (или userId), amount, type, description, date
  *
@@ -24,6 +24,7 @@ export type SheetClient = {
   birthDate: string;
   createdAt: string;
   beneficiary: string;
+  accountNumber: string;
   transactions: { id: string; amount: number; type: string; description: string; date: string }[];
 };
 
@@ -102,6 +103,8 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
   const birthDate = String(row.get("birthDate") ?? "").trim() || "—";
   const createdAt = String(row.get("createdAt") ?? "").trim() || "—";
   const beneficiary = String(row.get("beneficiary") ?? "").trim() || "—";
+  const accountNumberRaw = row.get("accountNumber") ?? row.get("account number") ?? row.get("Account Number") ?? "";
+  const accountNumber = String(accountNumberRaw).trim() || "—";
   const txSheet = spreadsheet.sheetsByTitle["Транзакции"];
   let transactions: SheetClient["transactions"] = [];
   if (txSheet && clientEmail) {
@@ -136,6 +139,7 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
     birthDate,
     createdAt,
     beneficiary,
+    accountNumber,
     transactions,
   };
 }

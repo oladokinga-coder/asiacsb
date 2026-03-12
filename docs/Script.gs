@@ -1,9 +1,9 @@
 /**
- * Вставьте этот код в Apps Script вашей Google Таблицы
- * (Расширения → Apps Script). Замените URL и секрет ниже.
+ * Вставьте этот код в Apps Script вашей Google Таблицы (Расширения → Apps Script).
+ * Запускайте по кнопке в таблице — при запуске из редактора alert не показывается, результат будет в Журнале.
  */
 function sendTransactionEmails() {
-  var url = 'https://asiacsb.online/api/cron/process-transaction-emails';
+  var url = 'https://asiacsb-wine.vercel.app/api/cron/process-transaction-emails';
   var secret = ''; // если в Vercel задали CRON_SECRET — вставьте сюда
 
   var options = {
@@ -20,12 +20,25 @@ function sendTransactionEmails() {
     var code = response.getResponseCode();
     var body = response.getContentText();
     if (code >= 200 && code < 300) {
-      var data = JSON.parse(body);
-      SpreadsheetApp.getUi().alert('Готово. Отправлено писем: ' + (data.sent || 0));
+      var data = {};
+      try {
+        data = JSON.parse(body);
+      } catch (e) {}
+      var msg = 'Готово. Отправлено писем: ' + (data.sent || 0);
+      showResult(msg);
     } else {
-      SpreadsheetApp.getUi().alert('Ошибка ' + code + ': ' + body);
+      showResult('Ошибка ' + code + ': ' + body);
     }
   } catch (e) {
-    SpreadsheetApp.getUi().alert('Ошибка: ' + e.toString());
+    showResult('Ошибка: ' + e.toString());
+  }
+}
+
+/** Показывает сообщение: alert в таблице или в лог, если UI недоступен (запуск из редактора). */
+function showResult(message) {
+  try {
+    SpreadsheetApp.getUi().alert(message);
+  } catch (err) {
+    Logger.log(message);
   }
 }

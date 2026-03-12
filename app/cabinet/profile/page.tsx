@@ -49,6 +49,7 @@ export default async function ProfilePage() {
   const birthDateDisplay = sheet?.birthDate && sheet.birthDate !== "—" ? formatDate(sheet.birthDate, intlLocale) : "—";
   const createdAtDisplay = sheet?.createdAt && sheet.createdAt !== "—" ? formatDate(sheet.createdAt, intlLocale) : formatDate(user.createdAt.toString(), intlLocale);
   const beneficiaryDisplay = sheet?.beneficiary && sheet.beneficiary !== "—" ? sheet.beneficiary : null;
+  const accountNumberDisplay = sheet?.accountNumber && sheet.accountNumber !== "—" ? sheet.accountNumber : null;
 
   return (
     <div className="container py-8">
@@ -89,6 +90,12 @@ export default async function ProfilePage() {
             <div>
               <dt className="text-sm text-[var(--text-muted)]">{t("profileBeneficiary")}</dt>
               <dd className="font-medium">{beneficiaryDisplay}</dd>
+            </div>
+          )}
+          {accountNumberDisplay != null && (
+            <div>
+              <dt className="text-sm text-[var(--text-muted)]">{t("profileAccountNumber")}</dt>
+              <dd className="font-medium">{accountNumberDisplay}</dd>
             </div>
           )}
           <div>
