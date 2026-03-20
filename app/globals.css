@@ -181,9 +181,13 @@ input, select, textarea {
 }
 
 .bank-card .card-visa {
-  width: 44px;
-  height: 34px;
-  margin-bottom: 24px;
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2;
+  width: 90px;
+  height: 30px;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,6 +198,8 @@ input, select, textarea {
   letter-spacing: 0.15em;
   margin-bottom: 16px;
   word-break: break-all;
+  position: relative;
+  z-index: 1;
 }
 .bank-card .card-meta {
   display: flex;
