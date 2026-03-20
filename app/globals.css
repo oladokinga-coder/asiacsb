@@ -179,6 +179,15 @@ input, select, textarea {
   border-radius: 6px;
   margin-bottom: 24px;
 }
+
+.bank-card .card-visa {
+  width: 44px;
+  height: 34px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .bank-card .card-number {
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.35rem;

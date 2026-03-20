@@ -8,6 +8,7 @@ import { getT, getLocaleFromCookie } from "@/lib/i18n";
 import Link from "next/link";
 import { CreditCard, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { OverviewActions } from "./OverviewActions";
+import { VisaLogo } from "@/app/components/VisaLogo";
 
 export default async function CabinetPage() {
   const cookieStore = await cookies();
@@ -57,7 +58,9 @@ export default async function CabinetPage() {
           </div>
           <div className="bank-card animate-float animate-scale-in" style={{ animationDelay: "0.2s", opacity: 0 }}>
             <span className="card-logo">CA</span>
-            <div className="card-chip" />
+            <div className="card-visa" aria-hidden>
+              <VisaLogo />
+            </div>
             <div className="card-number mono">{formatCardNumber(cardNumber)}</div>
             <div className="card-meta">
               <span>{t("cardValidUntil")} {cardValid}</span>
