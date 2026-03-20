@@ -5,7 +5,6 @@ import { prisma } from "@/lib/db";
 import { getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
 import { getT, getLocaleFromCookie } from "@/lib/i18n";
 import { CardActions } from "./CardActions";
-import { VisaLogo } from "@/app/components/VisaLogo";
 
 export default async function CardPage() {
   const cookieStore = await cookies();
@@ -49,9 +48,7 @@ export default async function CardPage() {
       <div className="max-w-md">
         <div className="bank-card animate-float animate-scale-in card-hover-lift" style={{ animationDelay: "0.1s", opacity: 0 }}>
           <span className="card-logo">CA</span>
-          <div className="card-visa" aria-hidden>
-            <VisaLogo />
-          </div>
+          <div className="card-chip" />
           <p className="text-sm text-[var(--text-muted)] mb-1">{t("cardNameLabel")}</p>
           <p className="font-semibold mb-4">{name.toUpperCase()}</p>
           <div className="card-number mono">{formatCardNumber(cardNumber)}</div>
