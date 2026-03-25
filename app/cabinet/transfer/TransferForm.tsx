@@ -76,12 +76,20 @@ export function TransferForm() {
     };
   }, []);
 
+  useEffect(() => {
+    if (transferType === "domestic") {
+      setBeneficiaryCountry("CZ");
+    }
+  }, [transferType]);
+
+  const domesticCzkBlocked = transferType === "domestic";
   const sourceOk =
     transferAllowed &&
     sheetConnected &&
     cardNumber.replace(/\s/g, "") !== "" &&
     cardNumber !== "—" &&
     /^\d{12,19}$/.test(cardNumber.replace(/\s/g, ""));
+  const canProceed = sourceOk && !domesticCzkBlocked;
   const maxAmount = roundMoney(balance);
 
   function mapError(code: string): string {
@@ -102,6 +110,8 @@ export function TransferForm() {
         return t("transferErrorIban");
       case "INVALID_BIC":
         return t("transferErrorBic");
+      case "DOMESTIC_CZK_CARD_REQUIRED":
+        return t("transferErrorDomesticCzkCard");
       default:
         return t("transferErrorGeneric");
     }
@@ -117,6 +127,10 @@ export function TransferForm() {
     }
     if (!transferAllowed) {
       setError(t("cardErrorUnavailable"));
+      return;
+    }
+    if (transferType === "domestic") {
+      setError(t("transferErrorDomesticCzkCard"));
       return;
     }
 
@@ -258,20 +272,32 @@ export function TransferForm() {
 
         <div className="input-group">
           <label>{t("transferBeneficiaryCountry")}</label>
-          <select
-            className={selectClass}
-            value={beneficiaryCountry}
-            onChange={(e) => setBeneficiaryCountry(e.target.value)}
-            required
-            disabled={submitting}
-          >
-            <option value="">{t("countryPlaceholder")}</option>
-            {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          {transferType === "domestic" ? (
+            <>
+              <div
+                className={`${selectClass} text-[var(--text)] cursor-not-allowed`}
+                aria-readonly="true"
+              >
+                {t("countryNameCzechia")}
+              </div>
+              <p className="text-xs text-[var(--text-muted)] mt-2">{t("transferDomesticCountryNote")}</p>
+            </>
+          ) : (
+            <select
+              className={selectClass}
+              value={beneficiaryCountry}
+              onChange={(e) => setBeneficiaryCountry(e.target.value)}
+              required
+              disabled={submitting}
+            >
+              <option value="">{t("countryPlaceholder")}</option>
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div className="input-group">
@@ -362,7 +388,11 @@ export function TransferForm() {
           <p className="text-sm text-[var(--text-muted)] mb-3">{t("transferFromCard")}</p>
           <div
             className={`p-4 rounded-[var(--radius)] border transition-colors ${
-              sourceOk ? "border-[var(--accent)]/40 bg-[var(--bg-elevated)]" : "border-[var(--border)] opacity-70"
+              domesticCzkBlocked
+                ? "border-[var(--danger)]/45 bg-[var(--danger)]/[0.06]"
+                : sourceOk
+                  ? "border-[var(--accent)]/40 bg-[var(--bg-elevated)]"
+                  : "border-[var(--border)] opacity-70"
             }`}
             role="group"
             aria-label={t("transferFromCard")}
@@ -373,7 +403,16 @@ export function TransferForm() {
               {t("cardValidUntil")} {cardValid}
             </p>
           </div>
-          {!sourceOk && !loadingMe && sheetConnected && transferAllowed && (
+          {domesticCzkBlocked && !loadingMe && (
+            <div
+              className="mt-3 p-4 rounded-[var(--radius)] border border-[var(--danger)]/25 bg-[var(--danger)]/[0.08]"
+              role="alert"
+            >
+              <p className="text-sm font-semibold text-[var(--danger)]">{t("transferDomesticCzkCardTitle")}</p>
+              <p className="text-sm text-[var(--text)] mt-2 leading-relaxed">{t("transferDomesticCzkCardBody")}</p>
+            </div>
+          )}
+          {!sourceOk && !loadingMe && sheetConnected && transferAllowed && !domesticCzkBlocked && (
             <p className="mt-2 text-sm text-[var(--danger)]">{t("transferErrorNoCard")}</p>
           )}
         </div>
@@ -393,7 +432,7 @@ export function TransferForm() {
             value={amountStr}
             onChange={(e) => setAmountStr(e.target.value)}
             required
-            disabled={submitting || !sourceOk}
+            disabled={submitting || !canProceed}
             className="mono"
           />
         </div>
@@ -402,7 +441,7 @@ export function TransferForm() {
           <button
             type="submit"
             className="btn btn-primary w-full py-3"
-            disabled={submitting || !sourceOk || loadingMe || maxAmount <= 0 || phase !== "form"}
+            disabled={submitting || !canProceed || loadingMe || maxAmount <= 0 || phase !== "form"}
           >
             {submitting ? t("transferSubmitting") : t("transferSubmit")}
           </button>

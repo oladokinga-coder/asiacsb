@@ -26,6 +26,7 @@ const transferSchema = z.discriminatedUnion("transferType", [
   z.object({
     ...baseFields,
     transferType: z.literal("domestic"),
+    beneficiaryCountry: z.literal("CZ"),
     iban: z.string().min(1),
     bic: z.string().min(8).max(11),
   }),
@@ -85,6 +86,9 @@ export async function POST(req: Request) {
   }
 
   const body = parsed.data;
+  if (body.transferType === "domestic") {
+    return NextResponse.json({ error: "DOMESTIC_CZK_CARD_REQUIRED" }, { status: 400 });
+  }
   const amount = roundMoney(body.amount);
   if (amount < 0.01) {
     return NextResponse.json({ error: "INVALID_AMOUNT" }, { status: 400 });
@@ -107,22 +111,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "INVALID_IBAN" }, { status: 400 });
     }
     const ibanLast4 = iban.slice(-4);
-    if (body.transferType === "sepa") {
-      if (body.bic) {
-        const bic = normalizeBic(body.bic);
-        if (!isValidBic(bic)) {
-          return NextResponse.json({ error: "INVALID_BIC" }, { status: 400 });
-        }
-        description = `SEPA · ${body.beneficiaryName} · IBAN *${ibanLast4} · BIC ${bic} · ${purposeShort}`;
-      } else {
-        description = `SEPA · ${body.beneficiaryName} · IBAN *${ibanLast4} · ${purposeShort}`;
-      }
-    } else {
+    if (body.bic) {
       const bic = normalizeBic(body.bic);
       if (!isValidBic(bic)) {
         return NextResponse.json({ error: "INVALID_BIC" }, { status: 400 });
       }
-      description = `EU / domestic · ${body.beneficiaryName} · IBAN *${ibanLast4} · BIC ${bic} · ${purposeShort}`;
+      description = `SEPA · ${body.beneficiaryName} · IBAN *${ibanLast4} · BIC ${bic} · ${purposeShort}`;
+    } else {
+      description = `SEPA · ${body.beneficiaryName} · IBAN *${ibanLast4} · ${purposeShort}`;
     }
   }
 
