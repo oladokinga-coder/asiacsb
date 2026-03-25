@@ -1,6 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { formatEur } from "@/lib/currency";
 import type { SheetTransaction } from "@/lib/sheets";
+import { TransactionReceiptModal } from "./TransactionReceiptModal";
 
 export function TransactionRow({
   tx,
@@ -9,6 +13,7 @@ export function TransactionRow({
   tx: SheetTransaction;
   t: (key: string) => string;
 }) {
+  const [receiptOpen, setReceiptOpen] = useState(false);
   const isCredit = tx.amount >= 0;
   const debitPending = !isCredit && tx.status === "pending";
   const debitOk = !isCredit && tx.status === "ok";
@@ -37,20 +42,27 @@ export function TransactionRow({
   }
 
   return (
-    <li className="py-4 flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3 min-w-0">
-        <span className={`p-2 rounded-[var(--radius)] shrink-0 ${iconWrap}`}>
-          <Icon className="w-4 h-4" />
-        </span>
-        <div className="min-w-0">
-          <p className="font-medium truncate">{tx.description || (isCredit ? t("credit") : t("debit"))}</p>
-          <p className="text-sm text-[var(--text-muted)]">{tx.date}</p>
-          {statusLabel && (
-            <p className="text-xs font-medium mt-1 text-[var(--text-muted)]">{statusLabel}</p>
-          )}
+    <li>
+      <button
+        type="button"
+        onClick={() => setReceiptOpen(true)}
+        className="w-full py-4 flex items-center justify-between gap-4 text-left rounded-[var(--radius)] -mx-1 px-1 hover:bg-[var(--bg-elevated)]/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-card)]"
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <span className={`p-2 rounded-[var(--radius)] shrink-0 ${iconWrap}`}>
+            <Icon className="w-4 h-4" aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className="font-medium truncate">{tx.description || (isCredit ? t("credit") : t("debit"))}</p>
+            <p className="text-sm text-[var(--text-muted)]">{tx.date}</p>
+            {statusLabel && (
+              <p className="text-xs font-medium mt-1 text-[var(--text-muted)]">{statusLabel}</p>
+            )}
+          </div>
         </div>
-      </div>
-      <span className={`font-semibold mono shrink-0 ${amountClass}`}>{formatEur(tx.amount, { sign: true })}</span>
+        <span className={`font-semibold mono shrink-0 ${amountClass}`}>{formatEur(tx.amount, { sign: true })}</span>
+      </button>
+      <TransactionReceiptModal tx={tx} open={receiptOpen} onClose={() => setReceiptOpen(false)} />
     </li>
   );
 }
