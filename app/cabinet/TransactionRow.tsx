@@ -2,17 +2,13 @@
 
 import { useState } from "react";
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { useI18n } from "@/app/components/LanguageProvider";
 import { formatEur } from "@/lib/currency";
 import type { SheetTransaction } from "@/lib/sheets";
 import { TransactionReceiptModal } from "./TransactionReceiptModal";
 
-export function TransactionRow({
-  tx,
-  t,
-}: {
-  tx: SheetTransaction;
-  t: (key: string) => string;
-}) {
+export function TransactionRow({ tx }: { tx: SheetTransaction }) {
+  const { t } = useI18n();
   const [receiptOpen, setReceiptOpen] = useState(false);
   const isCredit = tx.amount >= 0;
   const debitPending = !isCredit && tx.status === "pending";

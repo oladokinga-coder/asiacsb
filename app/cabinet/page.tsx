@@ -89,7 +89,7 @@ export default async function CabinetPage() {
         ) : (
           <ul className="divide-y divide-[var(--border)] cabinet-stagger">
             {recentTransactions.map((tx) => (
-              <TransactionRow key={tx.id} tx={tx} t={t} />
+              <TransactionRow key={tx.id} tx={tx} />
             ))}
           </ul>
         )}

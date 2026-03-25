@@ -38,7 +38,7 @@ export default async function TransactionsPage() {
         ) : (
           <ul className="divide-y divide-[var(--border)] cabinet-stagger">
             {transactions.map((tx) => (
-              <TransactionRow key={tx.id} tx={tx} t={t} />
+              <TransactionRow key={tx.id} tx={tx} />
             ))}
           </ul>
         )}
