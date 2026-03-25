@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useI18n } from "../../components/LanguageProvider";
-import { Lock, Snowflake, Sliders, KeyRound, Radio, Wallet } from "lucide-react";
+import { Lock, Snowflake, Sliders, KeyRound, Radio, CreditCard } from "lucide-react";
 
 const ACTIONS = [
   { key: "cardBlock", icon: Lock },
@@ -10,7 +10,7 @@ const ACTIONS = [
   { key: "cardLimits", icon: Sliders },
   { key: "cardChangePin", icon: KeyRound },
   { key: "cardContactless", icon: Radio },
-  { key: "cardAddToWallet", icon: Wallet },
+  { key: "cardAddCard", icon: CreditCard },
 ] as const;
 
 export function CardActions() {

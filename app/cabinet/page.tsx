@@ -8,6 +8,7 @@ import { formatCardNumberForDisplay } from "@/lib/card-format";
 import { getT, getLocaleFromCookie } from "@/lib/i18n";
 import Link from "next/link";
 import { CreditCard } from "lucide-react";
+import { VisaLogo } from "@/app/components/VisaLogo";
 import { OverviewActions } from "./OverviewActions";
 import { TransactionRow } from "./TransactionRow";
 import type { SheetTransaction } from "@/lib/sheets";
@@ -61,7 +62,9 @@ export default async function CabinetPage() {
             <p className="text-3xl font-bold mono">{formatEur(balance)}</p>
           </div>
           <div className="bank-card animate-float animate-scale-in" style={{ animationDelay: "0.2s", opacity: 0 }}>
-            <span className="card-logo">CA</span>
+            <span className="card-logo">
+              <VisaLogo />
+            </span>
             <div className="card-chip" />
             <div className="card-number mono">{formatCardNumberForDisplay(cardNumber)}</div>
             <div className="card-meta">
