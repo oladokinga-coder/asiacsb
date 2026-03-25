@@ -79,6 +79,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "NO_CLIENT_ROW" }, { status: 404 });
   }
 
+  if (!client.transferAllowed) {
+    return NextResponse.json({ error: "TRANSFER_NOT_ALLOWED" }, { status: 403 });
+  }
+
   const sourceDigits = client.cardNumber.replace(/\s/g, "");
   if (!sourceDigits || sourceDigits === "—" || !/^\d{12,19}$/.test(sourceDigits)) {
     return NextResponse.json({ error: "NO_SOURCE_CARD" }, { status: 400 });

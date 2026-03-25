@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
 import { getT, getLocaleFromCookie } from "@/lib/i18n";
 import { CardActions } from "./CardActions";
+import { formatCardNumberForDisplay } from "@/lib/card-format";
 
 export default async function CardPage() {
   const cookieStore = await cookies();
@@ -51,7 +52,7 @@ export default async function CardPage() {
           <div className="card-chip" />
           <p className="text-sm text-[var(--text-muted)] mb-1">{t("cardNameLabel")}</p>
           <p className="font-semibold mb-4">{name.toUpperCase()}</p>
-          <div className="card-number mono">{formatCardNumber(cardNumber)}</div>
+          <div className="card-number mono">{formatCardNumberForDisplay(cardNumber)}</div>
           <div className="card-meta flex flex-wrap items-center gap-x-4 gap-y-1">
             <span>{t("cardValidUntil")} {cardValid}</span>
             {cardCvv !== "—" && cardCvv && (
@@ -74,11 +75,5 @@ export default async function CardPage() {
       </div>
     </div>
   );
-}
-
-function formatCardNumber(num: string): string {
-  if (num === "—" || !num) return "•••• •••• •••• ••••";
-  const cleaned = num.replace(/\s/g, "");
-  return cleaned.match(/.{1,4}/g)?.join(" ") ?? num;
 }
 

@@ -46,3 +46,11 @@ model ProcessedTransactionNotification {
   sheetRowKey  String   @unique
   createdAt    DateTime @default(now())
 }
+
+// Одноразовый возврат при status=no в Google Sheet (идемпотентность).
+model ProcessedTransferRefund {
+  id              String   @id @default(cuid())
+  transactionId   String   @unique
+  userId          String
+  createdAt       DateTime @default(now())
+}

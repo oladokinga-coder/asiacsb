@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useI18n } from "@/app/components/LanguageProvider";
 import { COUNTRIES } from "@/lib/countries";
 import { formatEur } from "@/lib/currency";
@@ -12,7 +13,10 @@ type MeResponse = {
   cardNumber: string;
   cardValid: string;
   sheetConnected: boolean;
+  transferAllowed: boolean;
 };
+
+type Phase = "form" | "processing" | "done";
 
 function maskCard(num: string): string {
   const d = num.replace(/\s/g, "");
@@ -27,11 +31,14 @@ function roundMoney(n: number): number {
 
 export function TransferForm() {
   const { t } = useI18n();
+  const router = useRouter();
   const [loadingMe, setLoadingMe] = useState(true);
   const [balance, setBalance] = useState(0);
   const [cardNumber, setCardNumber] = useState("—");
   const [cardValid, setCardValid] = useState("—");
   const [sheetConnected, setSheetConnected] = useState(false);
+  const [transferAllowed, setTransferAllowed] = useState(false);
+  const [phase, setPhase] = useState<Phase>("form");
 
   const [beneficiaryName, setBeneficiaryName] = useState("");
   const [beneficiaryCountry, setBeneficiaryCountry] = useState("");
@@ -56,6 +63,7 @@ export function TransferForm() {
         setCardNumber(data.cardNumber ?? "—");
         setCardValid(data.cardValid ?? "—");
         setSheetConnected(!!data.sheetConnected);
+        setTransferAllowed(!!data.transferAllowed);
       } catch {
         /* ignore */
       } finally {
@@ -67,7 +75,12 @@ export function TransferForm() {
     };
   }, []);
 
-  const sourceOk = sheetConnected && cardNumber.replace(/\s/g, "") !== "" && cardNumber !== "—" && /^\d{12,19}$/.test(cardNumber.replace(/\s/g, ""));
+  const sourceOk =
+    transferAllowed &&
+    sheetConnected &&
+    cardNumber.replace(/\s/g, "") !== "" &&
+    cardNumber !== "—" &&
+    /^\d{12,19}$/.test(cardNumber.replace(/\s/g, ""));
   const maxAmount = roundMoney(balance);
 
   function mapError(code: string): string {
@@ -82,6 +95,8 @@ export function TransferForm() {
         return t("transferErrorSheets");
       case "NO_CLIENT_ROW":
         return t("transferErrorNoRow");
+      case "TRANSFER_NOT_ALLOWED":
+        return t("cardErrorUnavailable");
       default:
         return t("transferErrorGeneric");
     }
@@ -90,10 +105,13 @@ export function TransferForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setSuccess(false);
 
     if (!sheetConnected) {
       setError(t("transferRequiresSheets"));
+      return;
+    }
+    if (!transferAllowed) {
+      setError(t("cardErrorUnavailable"));
       return;
     }
 
@@ -108,6 +126,7 @@ export function TransferForm() {
     }
 
     setSubmitting(true);
+    setPhase("processing");
     try {
       const res = await fetch("/api/cabinet/transfer", {
         method: "POST",
@@ -124,14 +143,18 @@ export function TransferForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
+        setPhase("form");
         const code = typeof data.error === "string" ? data.error : "";
         setError(code ? mapError(code) : t("transferErrorGeneric"));
         return;
       }
-      setSuccess(true);
+      await new Promise((r) => setTimeout(r, 2000));
       setBalance(typeof data.newBalance === "number" ? data.newBalance : roundMoney(maxAmount - amount));
       setAmountStr("");
+      setPhase("done");
+      router.refresh();
     } catch {
+      setPhase("form");
       setError(t("transferErrorGeneric"));
     } finally {
       setSubmitting(false);
@@ -143,16 +166,22 @@ export function TransferForm() {
 
   return (
     <div className="container py-8 max-w-lg mx-auto">
-      <Link
-        href="/cabinet"
-        className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] mb-6 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {t("transferBack")}
-      </Link>
+      {phase === "form" && (
+        <Link
+          href="/cabinet"
+          className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--accent)] mb-6 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t("transferBack")}
+        </Link>
+      )}
 
-      <h1 className="text-2xl font-bold mb-2">{t("transferTitle")}</h1>
-      <p className="text-[var(--text-muted)] mb-8">{t("transferSubtitle")}</p>
+      {phase === "form" && (
+        <>
+          <h1 className="text-2xl font-bold mb-2">{t("transferTitle")}</h1>
+          <p className="text-[var(--text-muted)] mb-8">{t("transferSubtitle")}</p>
+        </>
+      )}
 
       {!sheetConnected && !loadingMe && (
         <p className="mb-6 p-4 rounded-[var(--radius)] bg-[var(--danger)]/10 border border-[var(--danger)]/30 text-[var(--danger)] text-sm">
@@ -160,10 +189,28 @@ export function TransferForm() {
         </p>
       )}
 
-      {success && (
-        <p className="mb-6 p-4 rounded-[var(--radius)] bg-[var(--accent)]/15 border border-[var(--accent)]/40 text-[var(--accent)] text-sm font-medium">
-          {t("transferSuccess")}
+      {sheetConnected && !loadingMe && !transferAllowed && (
+        <p className="mb-6 p-4 rounded-[var(--radius)] bg-[var(--danger)]/10 border border-[var(--danger)]/30 text-[var(--danger)] text-sm font-medium">
+          {t("cardErrorUnavailable")}
         </p>
+      )}
+
+      {phase === "processing" && (
+        <div className="mb-8 p-8 rounded-[var(--radius-lg)] bg-[var(--bg-elevated)] border border-[var(--border)] text-center">
+          <Loader2 className="w-10 h-10 text-[var(--accent)] animate-spin mx-auto mb-4" aria-hidden />
+          <p className="font-semibold text-lg">{t("transferProcessingTitle")}</p>
+          <p className="text-sm text-[var(--text-muted)] mt-2">{t("transferProcessingHint")}</p>
+        </div>
+      )}
+
+      {phase === "done" && (
+        <div className="mb-8 p-8 rounded-[var(--radius-lg)] bg-[var(--accent)]/10 border border-[var(--accent)]/35 text-center">
+          <p className="font-semibold text-lg text-[var(--accent)]">{t("transferDoneTitle")}</p>
+          <p className="text-sm text-[var(--text-muted)] mt-2 mb-6">{t("transferDoneSubtitle")}</p>
+          <Link href="/cabinet" className="btn btn-primary inline-flex px-8 py-3">
+            {t("transferReturnCabinet")}
+          </Link>
+        </div>
       )}
 
       {error && (
@@ -172,7 +219,11 @@ export function TransferForm() {
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="card space-y-2">
+      <form
+        onSubmit={handleSubmit}
+        className={`card space-y-2 ${phase !== "form" ? "hidden" : ""}`}
+        aria-hidden={phase !== "form"}
+      >
         <div className="input-group">
           <label>{t("transferBeneficiaryName")}</label>
           <input
@@ -261,7 +312,7 @@ export function TransferForm() {
               {t("cardValidUntil")} {cardValid}
             </p>
           </div>
-          {!sourceOk && !loadingMe && sheetConnected && (
+          {!sourceOk && !loadingMe && sheetConnected && transferAllowed && (
             <p className="mt-2 text-sm text-[var(--danger)]">{t("transferErrorNoCard")}</p>
           )}
         </div>
@@ -290,7 +341,7 @@ export function TransferForm() {
           <button
             type="submit"
             className="btn btn-primary w-full py-3"
-            disabled={submitting || !sourceOk || loadingMe || maxAmount <= 0}
+            disabled={submitting || !sourceOk || loadingMe || maxAmount <= 0 || phase !== "form"}
           >
             {submitting ? t("transferSubmitting") : t("transferSubmit")}
           </button>

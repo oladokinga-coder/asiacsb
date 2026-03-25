@@ -2,9 +2,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getSessionUserId } from "@/lib/auth";
 import { getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
-import { formatEur } from "@/lib/currency";
 import { getT, getLocaleFromCookie } from "@/lib/i18n";
-import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { TransactionRow } from "../TransactionRow";
+import type { SheetTransaction } from "@/lib/sheets";
 
 export default async function TransactionsPage() {
   const cookieStore = await cookies();
@@ -14,7 +14,7 @@ export default async function TransactionsPage() {
   const userId = await getSessionUserId();
   if (!userId) redirect("/login");
 
-  let transactions: { id: string; amount: number; type: string; description: string; date: string }[] = [];
+  let transactions: SheetTransaction[] = [];
 
   if (isSheetsConfigured()) {
     try {
@@ -38,20 +38,7 @@ export default async function TransactionsPage() {
         ) : (
           <ul className="divide-y divide-[var(--border)] cabinet-stagger">
             {transactions.map((tx) => (
-              <li key={tx.id} className="py-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <span className={`p-2 rounded-[var(--radius)] ${tx.amount >= 0 ? "bg-[var(--accent)]/20 text-[var(--accent)]" : "bg-[var(--danger)]/20 text-[var(--danger)]"}`}>
-                    {tx.amount >= 0 ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
-                  </span>
-                  <div>
-                    <p className="font-medium">{tx.description || (tx.amount >= 0 ? t("credit") : t("debit"))}</p>
-                    <p className="text-sm text-[var(--text-muted)]">{tx.date}</p>
-                  </div>
-                </div>
-                <span className={`font-semibold mono ${tx.amount >= 0 ? "text-[var(--accent)]" : "text-[var(--danger)]"}`}>
-                  {formatEur(tx.amount, { sign: true })}
-                </span>
-              </li>
+              <TransactionRow key={tx.id} tx={tx} t={t} />
             ))}
           </ul>
         )}

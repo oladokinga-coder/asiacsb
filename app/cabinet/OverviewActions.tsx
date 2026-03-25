@@ -23,7 +23,7 @@ const ACTIONS: ActionItem[] = [
 const btnClass =
   "w-full flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-[var(--bg-card)] transition-colors text-[var(--text)]";
 
-export function OverviewActions() {
+export function OverviewActions({ transferAllowed }: { transferAllowed: boolean }) {
   const { t } = useI18n();
   const [errorUnder, setErrorUnder] = useState<string | null>(null);
 
@@ -34,9 +34,11 @@ export function OverviewActions() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
       {ACTIONS.map(({ key, icon: Icon, href }) => {
-        if (href) {
+        const effectiveHref =
+          key === "overviewTransfer" && href ? (transferAllowed ? href : undefined) : href;
+        if (effectiveHref) {
           return (
-            <Link key={key} href={href} className={btnClass}>
+            <Link key={key} href={effectiveHref} className={btnClass}>
               <span className="p-2.5 rounded-xl bg-[var(--bg)] border border-[var(--border)]">
                 <Icon className="w-5 h-5 text-[var(--accent)]" />
               </span>

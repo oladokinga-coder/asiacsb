@@ -20,7 +20,15 @@ export async function GET() {
   let balance = 0;
   let cardNumber = "—";
   let cardValid = "—";
-  let transactions: { id: string; amount: number; type: string; description: string; date: string }[] = [];
+  let transferAllowed = false;
+  let transactions: {
+    id: string;
+    amount: number;
+    type: string;
+    description: string;
+    date: string;
+    status: "pending" | "ok" | "no";
+  }[] = [];
 
   if (isSheetsConfigured()) {
     try {
@@ -29,6 +37,7 @@ export async function GET() {
         balance = sheetData.balance;
         cardNumber = sheetData.cardNumber;
         cardValid = sheetData.cardValid;
+        transferAllowed = sheetData.transferAllowed;
         transactions = sheetData.transactions;
       }
     } catch (e) {
@@ -41,6 +50,7 @@ export async function GET() {
     balance,
     cardNumber,
     cardValid,
+    transferAllowed,
     transactions,
     sheetConnected: isSheetsConfigured(),
   });

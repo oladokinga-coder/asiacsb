@@ -4,10 +4,13 @@ import { getSessionUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
 import { formatEur } from "@/lib/currency";
+import { formatCardNumberForDisplay } from "@/lib/card-format";
 import { getT, getLocaleFromCookie } from "@/lib/i18n";
 import Link from "next/link";
-import { CreditCard, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { OverviewActions } from "./OverviewActions";
+import { TransactionRow } from "./TransactionRow";
+import type { SheetTransaction } from "@/lib/sheets";
 
 export default async function CabinetPage() {
   const cookieStore = await cookies();
@@ -26,7 +29,8 @@ export default async function CabinetPage() {
   let balance = 0;
   let cardNumber = "—";
   let cardValid = "—";
-  let recentTransactions: { id: string; amount: number; type: string; description: string; date: string }[] = [];
+  let recentTransactions: SheetTransaction[] = [];
+  let transferAllowed = false;
 
   if (isSheetsConfigured()) {
     try {
@@ -35,6 +39,7 @@ export default async function CabinetPage() {
         balance = sheet.balance;
         cardNumber = sheet.cardNumber;
         cardValid = sheet.cardValid;
+        transferAllowed = sheet.transferAllowed;
         recentTransactions = sheet.transactions.slice(0, 5);
       }
     } catch (e) {
@@ -58,14 +63,14 @@ export default async function CabinetPage() {
           <div className="bank-card animate-float animate-scale-in" style={{ animationDelay: "0.2s", opacity: 0 }}>
             <span className="card-logo">CA</span>
             <div className="card-chip" />
-            <div className="card-number mono">{formatCardNumber(cardNumber)}</div>
+            <div className="card-number mono">{formatCardNumberForDisplay(cardNumber)}</div>
             <div className="card-meta">
               <span>{t("cardValidUntil")} {cardValid}</span>
             </div>
           </div>
         </div>
         <div className="animate-fade-in-up" style={{ animationDelay: "0.25s", opacity: 0 }}>
-          <OverviewActions />
+          <OverviewActions transferAllowed={transferAllowed} />
         </div>
       </div>
 
@@ -81,20 +86,7 @@ export default async function CabinetPage() {
         ) : (
           <ul className="divide-y divide-[var(--border)] cabinet-stagger">
             {recentTransactions.map((tx) => (
-              <li key={tx.id} className="py-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <span className={`p-2 rounded-[var(--radius)] ${tx.amount >= 0 ? "bg-[var(--accent)]/20 text-[var(--accent)]" : "bg-[var(--danger)]/20 text-[var(--danger)]"}`}>
-                    {tx.amount >= 0 ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
-                  </span>
-                  <div>
-                    <p className="font-medium">{tx.description || (tx.amount >= 0 ? t("credit") : t("debit"))}</p>
-                    <p className="text-sm text-[var(--text-muted)]">{tx.date}</p>
-                  </div>
-                </div>
-                <span className={`font-semibold mono ${tx.amount >= 0 ? "text-[var(--accent)]" : "text-[var(--danger)]"}`}>
-                  {formatEur(tx.amount, { sign: true })}
-                </span>
-              </li>
+              <TransactionRow key={tx.id} tx={tx} t={t} />
             ))}
           </ul>
         )}
@@ -107,10 +99,4 @@ export default async function CabinetPage() {
       )}
     </div>
   );
-}
-
-function formatCardNumber(num: string): string {
-  if (num === "—" || !num) return "•••• •••• •••• ••••";
-  const cleaned = num.replace(/\s/g, "");
-  return cleaned.match(/.{1,4}/g)?.join(" ") ?? num;
 }

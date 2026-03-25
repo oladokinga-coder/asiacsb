@@ -1,15 +1,28 @@
 /**
  * Работа с Google Таблицей.
  * Таблица должна содержать листы:
- * - "Клиенты": userId, email, fullName, balance, cardNumber, cardValid, cardCvv, passportSeries, passportNumber, birthDate, country, createdAt, beneficiary, accountNumber (опционально)
+ * - "Клиенты": … колонка trans = ok — разрешены переводы; пусто — нет.
  *   При регистрации заполняются: userId, email, fullName, passportSeries, passportNumber, birthDate, country, createdAt. Карта (cardNumber, cardValid, cardCvv) — вручную.
- * - "Транзакции": id, email (или userId), amount, type, description, date
+ * - "Транзакции": id, email (или userId), amount, type, description, date, status (пусто — в обработке; ok — отправлено; no — отменено, возврат на баланс)
  *
  * Настройка: GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY (или JSON ключ в одной переменной).
  */
 
+import { Prisma } from "@prisma/client";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
+import { normalizeCardNumberFromSheet } from "@/lib/card-format";
+import { prisma } from "@/lib/db";
+
+/** Статус строки в листе «Транзакции»: колонка status — пусто / ok / no */
+export type SheetTransaction = {
+  id: string;
+  amount: number;
+  type: string;
+  description: string;
+  date: string;
+  status: "pending" | "ok" | "no";
+};
 
 export type SheetClient = {
   balance: number;
@@ -25,8 +38,21 @@ export type SheetClient = {
   createdAt: string;
   beneficiary: string;
   accountNumber: string;
-  transactions: { id: string; amount: number; type: string; description: string; date: string }[];
+  /** Лист «Клиенты»: колонка trans = ok — разрешены переводы */
+  transferAllowed: boolean;
+  transactions: SheetTransaction[];
 };
+
+function normalizeTxStatus(raw: unknown): SheetTransaction["status"] {
+  const s = String(raw ?? "").trim().toLowerCase();
+  if (s === "ok") return "ok";
+  if (s === "no") return "no";
+  return "pending";
+}
+
+function roundMoney(n: number): number {
+  return Math.round(n * 100) / 100;
+}
 
 let doc: GoogleSpreadsheet | null = null;
 
@@ -91,7 +117,7 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
   if (!row) return null;
 
   const balance = Number(row.get("balance") ?? 0);
-  const cardNumber = String(row.get("cardNumber") ?? "").trim() || "—";
+  const cardNumber = normalizeCardNumberFromSheet(row.get("cardNumber")) || "—";
   const cardValid = String(row.get("cardValid") ?? "").trim() || "—";
   const cardCvvRaw = row.get("cardCvv") ?? row.get("CardCvv") ?? row.get("CVV") ?? row.get("cvv") ?? "";
   const cardCvv = String(cardCvvRaw).trim() || "—";
@@ -105,6 +131,9 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
   const beneficiary = String(row.get("beneficiary") ?? "").trim() || "—";
   const accountNumberRaw = row.get("accountNumber") ?? row.get("account number") ?? row.get("Account Number") ?? "";
   const accountNumber = String(accountNumberRaw).trim() || "—";
+  const transRaw = String(row.get("trans") ?? "").trim().toLowerCase();
+  const transferAllowed = transRaw === "ok";
+
   const txSheet = spreadsheet.sheetsByTitle["Транзакции"];
   let transactions: SheetClient["transactions"] = [];
   if (txSheet && clientEmail) {
@@ -121,13 +150,21 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
         type: String(r.get("type") ?? ""),
         description: String(r.get("description") ?? ""),
         date: String(r.get("date") ?? ""),
+        status: normalizeTxStatus(r.get("status")),
       }))
       .sort((a, b) => (b.date > a.date ? 1 : -1))
       .slice(0, 100);
   }
 
+  let adjustedBalance = roundMoney(balance);
+  try {
+    adjustedBalance = await applyPendingTransferRefunds(userId, transactions, adjustedBalance);
+  } catch (e) {
+    console.error("applyPendingTransferRefunds:", e);
+  }
+
   return {
-    balance,
+    balance: adjustedBalance,
     cardNumber,
     cardValid,
     cardCvv,
@@ -140,6 +177,7 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
     createdAt,
     beneficiary,
     accountNumber,
+    transferAllowed,
     transactions,
   };
 }
@@ -163,6 +201,47 @@ export async function updateClientBalanceInSheet(userId: string, newBalance: num
   raw.set("balance", newBalance);
   await raw.save();
   return true;
+}
+
+/**
+ * При status=no в таблице возвращает сумму на баланс (один раз на id; сначала запись в БД — меньше гонок).
+ */
+async function applyPendingTransferRefunds(
+  userId: string,
+  transactions: SheetTransaction[],
+  currentBalance: number
+): Promise<number> {
+  let balance = roundMoney(currentBalance);
+
+  for (const tx of transactions) {
+    if (tx.status !== "no") continue;
+    if (tx.amount >= 0) continue;
+    const id = tx.id?.trim();
+    if (!id) continue;
+
+    const refund = roundMoney(Math.abs(tx.amount));
+    const newBal = roundMoney(balance + refund);
+
+    try {
+      await prisma.processedTransferRefund.create({
+        data: { transactionId: id, userId },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+        continue;
+      }
+      throw e;
+    }
+
+    const ok = await updateClientBalanceInSheet(userId, newBal);
+    if (!ok) {
+      await prisma.processedTransferRefund.deleteMany({ where: { transactionId: id } });
+      continue;
+    }
+    balance = newBal;
+  }
+
+  return balance;
 }
 
 /**
@@ -199,6 +278,7 @@ export async function appendTransactionToSheet(params: {
     type: params.type || (params.amount >= 0 ? "Credit" : "Debit"),
     description: params.description || "",
     date: params.date,
+    status: "",
   };
   await txSheet.addRow(row);
   return { email };
