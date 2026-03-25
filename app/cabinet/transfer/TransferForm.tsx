@@ -43,13 +43,14 @@ export function TransferForm() {
   const [beneficiaryName, setBeneficiaryName] = useState("");
   const [beneficiaryCountry, setBeneficiaryCountry] = useState("");
   const [transferType, setTransferType] = useState<"sepa" | "domestic" | "international">("sepa");
+  const [iban, setIban] = useState("");
+  const [bic, setBic] = useState("");
   const [recipientCard, setRecipientCard] = useState("");
-  const [recipientExpiry, setRecipientExpiry] = useState("");
+  const [paymentPurpose, setPaymentPurpose] = useState("");
   const [amountStr, setAmountStr] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -97,6 +98,10 @@ export function TransferForm() {
         return t("transferErrorNoRow");
       case "TRANSFER_NOT_ALLOWED":
         return t("cardErrorUnavailable");
+      case "INVALID_IBAN":
+        return t("transferErrorIban");
+      case "INVALID_BIC":
+        return t("transferErrorBic");
       default:
         return t("transferErrorGeneric");
     }
@@ -128,18 +133,33 @@ export function TransferForm() {
     setSubmitting(true);
     setPhase("processing");
     try {
+      const base = {
+        beneficiaryName: beneficiaryName.trim(),
+        beneficiaryCountry,
+        transferType,
+        paymentPurpose: paymentPurpose.trim(),
+        sourceCardId: "primary" as const,
+        amount,
+      };
+      const body =
+        transferType === "international"
+          ? { ...base, recipientCardNumber: recipientCard.replace(/\D/g, "") }
+          : transferType === "sepa"
+            ? {
+                ...base,
+                iban: iban.trim(),
+                ...(bic.trim() ? { bic: bic.trim() } : {}),
+              }
+            : {
+                ...base,
+                iban: iban.trim(),
+                bic: bic.trim(),
+              };
+
       const res = await fetch("/api/cabinet/transfer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          beneficiaryName: beneficiaryName.trim(),
-          beneficiaryCountry,
-          transferType,
-          recipientCardNumber: recipientCard.replace(/\s/g, ""),
-          recipientCardExpiry: recipientExpiry.trim(),
-          sourceCardId: "primary",
-          amount,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -267,32 +287,73 @@ export function TransferForm() {
             <option value="domestic">{t("transferTypeDomestic")}</option>
             <option value="international">{t("transferTypeInternational")}</option>
           </select>
+          <p className="text-xs text-[var(--text-muted)] mt-2">{t("transferTypeHint")}</p>
         </div>
 
-        <div className="input-group">
-          <label>{t("transferRecipientCard")}</label>
-          <input
-            className="mono"
-            value={recipientCard}
-            onChange={(e) => setRecipientCard(e.target.value)}
-            required
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder="0000 0000 0000 0000"
-            disabled={submitting}
-          />
-        </div>
+        {(transferType === "sepa" || transferType === "domestic") && (
+          <>
+            <div className="input-group">
+              <label>{t("transferIban")}</label>
+              <input
+                className="mono"
+                value={iban}
+                onChange={(e) => setIban(e.target.value)}
+                required
+                autoComplete="off"
+                placeholder={t("transferIbanPlaceholder")}
+                disabled={submitting}
+                spellCheck={false}
+              />
+            </div>
+            <div className="input-group">
+              <label>
+                {t("transferBic")}{" "}
+                {transferType === "sepa" ? (
+                  <span className="text-[var(--text-muted)] font-normal">({t("transferBicOptional")})</span>
+                ) : (
+                  <span className="text-[var(--danger)]">*</span>
+                )}
+              </label>
+              <input
+                className="mono"
+                value={bic}
+                onChange={(e) => setBic(e.target.value)}
+                required={transferType === "domestic"}
+                autoComplete="off"
+                placeholder={t("transferBicPlaceholder")}
+                disabled={submitting}
+                spellCheck={false}
+              />
+            </div>
+          </>
+        )}
+
+        {transferType === "international" && (
+          <div className="input-group">
+            <label>{t("transferRecipientCard")}</label>
+            <input
+              className="mono"
+              value={recipientCard}
+              onChange={(e) => setRecipientCard(e.target.value)}
+              required
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="0000 0000 0000 0000"
+              disabled={submitting}
+            />
+          </div>
+        )}
 
         <div className="input-group">
-          <label>{t("transferRecipientExpiry")}</label>
-          <input
-            className="mono"
-            value={recipientExpiry}
-            onChange={(e) => setRecipientExpiry(e.target.value)}
+          <label>{t("transferPaymentPurpose")}</label>
+          <textarea
+            value={paymentPurpose}
+            onChange={(e) => setPaymentPurpose(e.target.value)}
             required
-            placeholder={t("transferRecipientExpiryPlaceholder")}
-            pattern="^(0[1-9]|1[0-2])\/[0-9]{2}$"
-            autoComplete="cc-exp"
+            rows={3}
+            maxLength={200}
+            className="w-full px-4 py-3 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--text)] resize-y min-h-[88px]"
+            placeholder={t("transferPaymentPurposePlaceholder")}
             disabled={submitting}
           />
         </div>

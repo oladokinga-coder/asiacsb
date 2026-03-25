@@ -3,8 +3,8 @@
  * Таблица должна содержать листы:
  * - "Клиенты": … колонка trans = ok — разрешены переводы; пусто — нет.
  *   При регистрации заполняются: userId, email, fullName, passportSeries, passportNumber, birthDate, country, createdAt. Карта (cardNumber, cardValid, cardCvv) — вручную.
- * - "Транзакции": id, email (или userId), amount, type, description, date, status (пусто — в обработке; ok — отправлено; no — отменено: отрицательная сумма не входит в баланс)
- *   Баланс в «Клиенты».balance пересчитывается автоматически как сумма всех операций (отменённые списания status=no не учитываются).
+ * - "Транзакции": id, email (или userId), amount, type, description, date, status (пусто — в обработке; ok — отправлено; no — отменено: отриц. сумма не входит в баланс)
+ *   Баланс в «Клиенты».balance пересчитывается из суммы операций (см. computeBalanceFromTransactions).
  *
  * Настройка: GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY (или JSON ключ в одной переменной).
  */
@@ -53,10 +53,41 @@ function roundMoney(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-/**
- * Баланс = сумма amount по всем транзакциям клиента.
- * Отрицательная операция со status=no (отмена списания) в сумму не входит — деньги «возвращены» логикой суммы.
- */
+/** Дата из ячейки (строка, число-сериал Sheets или Date) → строка для UI. */
+function formatDateCell(raw: unknown): string {
+  if (raw == null) return "";
+  if (raw instanceof Date) return raw.toISOString().split("T")[0];
+  if (typeof raw === "number") {
+    const epoch = Date.UTC(1899, 11, 30);
+    const ms = epoch + Math.round(raw * 86400000);
+    const d = new Date(ms);
+    if (!Number.isNaN(d.getTime())) return d.toISOString().split("T")[0];
+  }
+  return String(raw).trim();
+}
+
+/** Сортировка по времени: большее значение = новее. */
+function parseTxDateMsForSort(dateStr: string): number {
+  const s = dateStr.trim();
+  if (!s) return 0;
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    const t = Date.parse(s);
+    if (!Number.isNaN(t)) return t;
+  }
+  const dmy = /^(\d{1,2})[./](\d{1,2})[./](\d{2,4})/.exec(s);
+  if (dmy) {
+    const day = parseInt(dmy[1], 10);
+    const month = parseInt(dmy[2], 10) - 1;
+    let y = parseInt(dmy[3], 10);
+    if (y < 100) y += 2000;
+    const t = new Date(y, month, day).getTime();
+    if (!Number.isNaN(t)) return t;
+  }
+  const t = Date.parse(s);
+  return Number.isNaN(t) ? 0 : t;
+}
+
+/** Баланс = сумма amount; отрицательная со status=no не учитывается. */
 export function computeBalanceFromTransactions(transactions: SheetTransaction[]): number {
   let s = 0;
   for (const tx of transactions) {
@@ -152,21 +183,33 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
   let allForBalance: SheetTransaction[] = [];
   if (txSheet && clientEmail) {
     const txRows = await txSheet.getRows();
-    allForBalance = txRows
-      .filter((r) => {
-        const rowEmail = String(r.get("email") ?? "").trim();
-        const rowUserId = String(r.get("userId") ?? r.get("id") ?? "").trim();
-        return rowEmail === clientEmail || rowUserId === userId;
-      })
-      .map((r) => ({
-        id: String(r.get("id") ?? r.get("rowIndex") ?? ""),
-        amount: Number(r.get("amount") ?? 0),
-        type: String(r.get("type") ?? ""),
-        description: String(r.get("description") ?? ""),
-        date: String(r.get("date") ?? ""),
-        status: normalizeTxStatus(r.get("status")),
-      }));
-    transactions = [...allForBalance].sort((a, b) => (b.date > a.date ? 1 : -1)).slice(0, 100);
+    const filtered = txRows.filter((r) => {
+      const rowEmail = String(r.get("email") ?? "").trim();
+      const rowUserId = String(r.get("userId") ?? r.get("id") ?? "").trim();
+      return rowEmail === clientEmail || rowUserId === userId;
+    });
+    const enriched = filtered.map((r) => {
+      const dateStr = formatDateCell(r.get("date"));
+      const rowNum = (r as { rowNumber?: number }).rowNumber ?? 0;
+      return {
+        rowNum,
+        tx: {
+          id: String(r.get("id") ?? r.get("rowIndex") ?? ""),
+          amount: Number(r.get("amount") ?? 0),
+          type: String(r.get("type") ?? ""),
+          description: String(r.get("description") ?? ""),
+          date: dateStr,
+          status: normalizeTxStatus(r.get("status")),
+        },
+      };
+    });
+    enriched.sort((a, b) => {
+      const byTime = parseTxDateMsForSort(b.tx.date) - parseTxDateMsForSort(a.tx.date);
+      if (byTime !== 0) return byTime;
+      return b.rowNum - a.rowNum;
+    });
+    allForBalance = enriched.map((e) => e.tx);
+    transactions = allForBalance.slice(0, 100);
   }
 
   const computedBalance = computeBalanceFromTransactions(allForBalance);

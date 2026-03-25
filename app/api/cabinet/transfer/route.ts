@@ -2,18 +2,39 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSessionUserId } from "@/lib/auth";
 import { appendTransactionToSheet, getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
+import { isValidBic, isValidIban, normalizeBic, normalizeIban } from "@/lib/iban";
 
 export const dynamic = "force-dynamic";
 
-const transferSchema = z.object({
+const baseFields = {
   beneficiaryName: z.string().trim().min(2).max(120),
   beneficiaryCountry: z.string().length(2),
-  transferType: z.enum(["sepa", "domestic", "international"]),
-  recipientCardNumber: z.string().min(1),
-  recipientCardExpiry: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/),
+  paymentPurpose: z.string().trim().min(2).max(200),
   sourceCardId: z.literal("primary"),
   amount: z.number().finite().min(0.01).max(1_000_000),
-});
+};
+
+const transferSchema = z.discriminatedUnion("transferType", [
+  z.object({
+    ...baseFields,
+    transferType: z.literal("sepa"),
+    iban: z.string().min(1),
+    bic: z
+      .preprocess((v) => (typeof v === "string" && v.trim() === "" ? undefined : v), z.string().optional())
+      .optional(),
+  }),
+  z.object({
+    ...baseFields,
+    transferType: z.literal("domestic"),
+    iban: z.string().min(1),
+    bic: z.string().min(8).max(11),
+  }),
+  z.object({
+    ...baseFields,
+    transferType: z.literal("international"),
+    recipientCardNumber: z.string().min(1),
+  }),
+]);
 
 function luhnCheck(pan: string): boolean {
   const digits = pan.replace(/\D/g, "");
@@ -34,6 +55,11 @@ function luhnCheck(pan: string): boolean {
 
 function roundMoney(n: number): number {
   return Math.round(n * 100) / 100;
+}
+
+function truncate(s: string, max: number): string {
+  const t = s.trim();
+  return t.length <= max ? t : `${t.slice(0, max - 1)}…`;
 }
 
 export async function POST(req: Request) {
@@ -64,9 +90,40 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "INVALID_AMOUNT" }, { status: 400 });
   }
 
-  const pan = body.recipientCardNumber.replace(/\s/g, "");
-  if (!/^\d+$/.test(pan) || !luhnCheck(pan)) {
-    return NextResponse.json({ error: "INVALID_CARD" }, { status: 400 });
+  const purposeShort = truncate(body.paymentPurpose, 80);
+
+  let description: string;
+
+  if (body.transferType === "international") {
+    const pan = body.recipientCardNumber.replace(/\D/g, "");
+    if (!/^\d+$/.test(pan) || !luhnCheck(pan)) {
+      return NextResponse.json({ error: "INVALID_CARD" }, { status: 400 });
+    }
+    const last4 = pan.slice(-4);
+    description = `Intl card · ${body.beneficiaryName} · *${last4} · ${purposeShort}`;
+  } else {
+    const iban = normalizeIban(body.iban);
+    if (!isValidIban(iban)) {
+      return NextResponse.json({ error: "INVALID_IBAN" }, { status: 400 });
+    }
+    const ibanLast4 = iban.slice(-4);
+    if (body.transferType === "sepa") {
+      if (body.bic) {
+        const bic = normalizeBic(body.bic);
+        if (!isValidBic(bic)) {
+          return NextResponse.json({ error: "INVALID_BIC" }, { status: 400 });
+        }
+        description = `SEPA · ${body.beneficiaryName} · IBAN *${ibanLast4} · BIC ${bic} · ${purposeShort}`;
+      } else {
+        description = `SEPA · ${body.beneficiaryName} · IBAN *${ibanLast4} · ${purposeShort}`;
+      }
+    } else {
+      const bic = normalizeBic(body.bic);
+      if (!isValidBic(bic)) {
+        return NextResponse.json({ error: "INVALID_BIC" }, { status: 400 });
+      }
+      description = `EU / domestic · ${body.beneficiaryName} · IBAN *${ibanLast4} · BIC ${bic} · ${purposeShort}`;
+    }
   }
 
   const client = await getClientFromSheet(userId);
@@ -87,15 +144,6 @@ export async function POST(req: Request) {
   if (amount > oldBalance) {
     return NextResponse.json({ error: "INSUFFICIENT_FUNDS", balance: oldBalance }, { status: 400 });
   }
-
-  const last4 = pan.slice(-4);
-  const typeLabel =
-    body.transferType === "sepa"
-      ? "SEPA"
-      : body.transferType === "domestic"
-        ? "Domestic"
-        : "International";
-  const description = `Transfer (${typeLabel}) to ${body.beneficiaryName} · *${last4}`;
 
   const date = new Date().toISOString().split("T")[0];
 
