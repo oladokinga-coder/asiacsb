@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSessionUserId } from "@/lib/auth";
-import {
-  appendTransactionToSheet,
-  getClientFromSheet,
-  isSheetsConfigured,
-  updateClientBalanceInSheet,
-} from "@/lib/sheets";
+import { appendTransactionToSheet, getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
 
 export const dynamic = "force-dynamic";
 
@@ -93,7 +88,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "INSUFFICIENT_FUNDS", balance: oldBalance }, { status: 400 });
   }
 
-  const newBalance = roundMoney(oldBalance - amount);
   const last4 = pan.slice(-4);
   const typeLabel =
     body.transferType === "sepa"
@@ -105,11 +99,6 @@ export async function POST(req: Request) {
 
   const date = new Date().toISOString().split("T")[0];
 
-  const updated = await updateClientBalanceInSheet(userId, newBalance);
-  if (!updated) {
-    return NextResponse.json({ error: "BALANCE_UPDATE_FAILED" }, { status: 500 });
-  }
-
   try {
     const { email } = await appendTransactionToSheet({
       userId,
@@ -119,19 +108,19 @@ export async function POST(req: Request) {
       date,
     });
     if (!email) {
-      await updateClientBalanceInSheet(userId, oldBalance);
       return NextResponse.json({ error: "TRANSACTION_APPEND_FAILED" }, { status: 500 });
     }
   } catch (e) {
-    await updateClientBalanceInSheet(userId, oldBalance);
     const message = e instanceof Error ? e.message : String(e);
     console.error("Transfer append error:", e);
     return NextResponse.json({ error: "TRANSACTION_APPEND_FAILED", detail: message }, { status: 500 });
   }
 
+  const clientAfter = await getClientFromSheet(userId);
+
   return NextResponse.json({
     ok: true,
-    newBalance,
+    newBalance: clientAfter ? roundMoney(clientAfter.balance) : roundMoney(oldBalance - amount),
     description,
     date,
   });

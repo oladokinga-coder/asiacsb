@@ -19,14 +19,14 @@ export function TransactionRow({
   if (!isCredit) {
     Icon = ArrowUpRight;
     if (debitPending) iconWrap = "bg-amber-500/20 text-amber-400";
-    else if (debitOk) iconWrap = "bg-[var(--accent)]/25 text-[var(--accent)]";
+    else if (debitOk) iconWrap = "bg-[var(--danger)]/20 text-[var(--danger)]";
     else if (debitNo) iconWrap = "bg-[var(--text-muted)]/25 text-[var(--text-muted)]";
     else iconWrap = "bg-[var(--danger)]/20 text-[var(--danger)]";
   }
 
   let amountClass = isCredit ? "text-[var(--accent)]" : "text-[var(--danger)]";
   if (debitPending) amountClass = "text-amber-400";
-  if (debitOk) amountClass = "text-[var(--accent)]";
+  if (debitOk) amountClass = "text-[var(--danger)]";
   if (debitNo) amountClass = "text-[var(--text-muted)] line-through decoration-[var(--text-muted)]";
 
   let statusLabel: string | null = null;

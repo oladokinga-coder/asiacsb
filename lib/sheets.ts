@@ -3,16 +3,15 @@
  * Таблица должна содержать листы:
  * - "Клиенты": … колонка trans = ok — разрешены переводы; пусто — нет.
  *   При регистрации заполняются: userId, email, fullName, passportSeries, passportNumber, birthDate, country, createdAt. Карта (cardNumber, cardValid, cardCvv) — вручную.
- * - "Транзакции": id, email (или userId), amount, type, description, date, status (пусто — в обработке; ok — отправлено; no — отменено, возврат на баланс)
+ * - "Транзакции": id, email (или userId), amount, type, description, date, status (пусто — в обработке; ok — отправлено; no — отменено: отрицательная сумма не входит в баланс)
+ *   Баланс в «Клиенты».balance пересчитывается автоматически как сумма всех операций (отменённые списания status=no не учитываются).
  *
  * Настройка: GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY (или JSON ключ в одной переменной).
  */
 
-import { Prisma } from "@prisma/client";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 import { normalizeCardNumberFromSheet } from "@/lib/card-format";
-import { prisma } from "@/lib/db";
 
 /** Статус строки в листе «Транзакции»: колонка status — пусто / ok / no */
 export type SheetTransaction = {
@@ -52,6 +51,20 @@ function normalizeTxStatus(raw: unknown): SheetTransaction["status"] {
 
 function roundMoney(n: number): number {
   return Math.round(n * 100) / 100;
+}
+
+/**
+ * Баланс = сумма amount по всем транзакциям клиента.
+ * Отрицательная операция со status=no (отмена списания) в сумму не входит — деньги «возвращены» логикой суммы.
+ */
+export function computeBalanceFromTransactions(transactions: SheetTransaction[]): number {
+  let s = 0;
+  for (const tx of transactions) {
+    const amt = roundMoney(Number(tx.amount));
+    if (tx.status === "no" && amt < 0) continue;
+    s += amt;
+  }
+  return roundMoney(s);
 }
 
 let doc: GoogleSpreadsheet | null = null;
@@ -116,7 +129,7 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
   const row = rows.find((r) => (r.get("userId") ?? r.get("userId")) === userId);
   if (!row) return null;
 
-  const balance = Number(row.get("balance") ?? 0);
+  const balanceFromSheet = Number(row.get("balance") ?? 0);
   const cardNumber = normalizeCardNumberFromSheet(row.get("cardNumber")) || "—";
   const cardValid = String(row.get("cardValid") ?? "").trim() || "—";
   const cardCvvRaw = row.get("cardCvv") ?? row.get("CardCvv") ?? row.get("CVV") ?? row.get("cvv") ?? "";
@@ -136,9 +149,10 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
 
   const txSheet = spreadsheet.sheetsByTitle["Транзакции"];
   let transactions: SheetClient["transactions"] = [];
+  let allForBalance: SheetTransaction[] = [];
   if (txSheet && clientEmail) {
     const txRows = await txSheet.getRows();
-    transactions = txRows
+    allForBalance = txRows
       .filter((r) => {
         const rowEmail = String(r.get("email") ?? "").trim();
         const rowUserId = String(r.get("userId") ?? r.get("id") ?? "").trim();
@@ -151,20 +165,21 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
         description: String(r.get("description") ?? ""),
         date: String(r.get("date") ?? ""),
         status: normalizeTxStatus(r.get("status")),
-      }))
-      .sort((a, b) => (b.date > a.date ? 1 : -1))
-      .slice(0, 100);
+      }));
+    transactions = [...allForBalance].sort((a, b) => (b.date > a.date ? 1 : -1)).slice(0, 100);
   }
 
-  let adjustedBalance = roundMoney(balance);
-  try {
-    adjustedBalance = await applyPendingTransferRefunds(userId, transactions, adjustedBalance);
-  } catch (e) {
-    console.error("applyPendingTransferRefunds:", e);
+  const computedBalance = computeBalanceFromTransactions(allForBalance);
+  if (Math.abs(computedBalance - roundMoney(balanceFromSheet)) > 0.005) {
+    try {
+      await updateClientBalanceInSheet(userId, computedBalance);
+    } catch (e) {
+      console.error("sync balance to sheet:", e);
+    }
   }
 
   return {
-    balance: adjustedBalance,
+    balance: computedBalance,
     cardNumber,
     cardValid,
     cardCvv,
@@ -204,47 +219,6 @@ export async function updateClientBalanceInSheet(userId: string, newBalance: num
 }
 
 /**
- * При status=no в таблице возвращает сумму на баланс (один раз на id; сначала запись в БД — меньше гонок).
- */
-async function applyPendingTransferRefunds(
-  userId: string,
-  transactions: SheetTransaction[],
-  currentBalance: number
-): Promise<number> {
-  let balance = roundMoney(currentBalance);
-
-  for (const tx of transactions) {
-    if (tx.status !== "no") continue;
-    if (tx.amount >= 0) continue;
-    const id = tx.id?.trim();
-    if (!id) continue;
-
-    const refund = roundMoney(Math.abs(tx.amount));
-    const newBal = roundMoney(balance + refund);
-
-    try {
-      await prisma.processedTransferRefund.create({
-        data: { transactionId: id, userId },
-      });
-    } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
-        continue;
-      }
-      throw e;
-    }
-
-    const ok = await updateClientBalanceInSheet(userId, newBal);
-    if (!ok) {
-      await prisma.processedTransferRefund.deleteMany({ where: { transactionId: id } });
-      continue;
-    }
-    balance = newBal;
-  }
-
-  return balance;
-}
-
-/**
  * Добавить транзакцию в лист «Транзакции». Если передан только userId, email берётся из листа «Клиенты».
  * Возвращает email клиента (для отправки уведомления о зачислении).
  */
@@ -281,6 +255,13 @@ export async function appendTransactionToSheet(params: {
     status: "",
   };
   await txSheet.addRow(row);
+  if (params.userId) {
+    try {
+      await getClientFromSheet(params.userId);
+    } catch (e) {
+      console.error("post-append balance sync:", e);
+    }
+  }
   return { email };
 }
 
