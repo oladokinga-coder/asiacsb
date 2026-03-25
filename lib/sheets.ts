@@ -145,6 +145,27 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
 }
 
 /**
+ * Обновить колонку balance в строке клиента по userId (лист «Клиенты»).
+ */
+export async function updateClientBalanceInSheet(userId: string, newBalance: number): Promise<boolean> {
+  const spreadsheet = getDoc();
+  if (!spreadsheet) return false;
+
+  await spreadsheet.loadInfo();
+  const clientsSheet = spreadsheet.sheetsByTitle["Клиенты"];
+  if (!clientsSheet) return false;
+
+  const rows = await clientsSheet.getRows();
+  const row = rows.find((r) => String(r.get("userId") ?? "").trim() === userId);
+  if (!row) return false;
+
+  const raw = row as { set: (key: string, value: string | number) => void; save: () => Promise<void> };
+  raw.set("balance", newBalance);
+  await raw.save();
+  return true;
+}
+
+/**
  * Добавить транзакцию в лист «Транзакции». Если передан только userId, email берётся из листа «Клиенты».
  * Возвращает email клиента (для отправки уведомления о зачислении).
  */

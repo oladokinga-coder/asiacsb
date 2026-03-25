@@ -42,5 +42,6 @@ export async function GET() {
     cardNumber,
     cardValid,
     transactions,
+    sheetConnected: isSheetsConfigured(),
   });
 }

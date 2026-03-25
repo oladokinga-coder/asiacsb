@@ -12,7 +12,7 @@ type ActionItem = {
 };
 
 const ACTIONS: ActionItem[] = [
-  { key: "overviewTransfer", icon: ArrowLeftRight },
+  { key: "overviewTransfer", icon: ArrowLeftRight, href: "/cabinet/transfer" },
   { key: "overviewPay", icon: CreditCard },
   { key: "overviewTopUp", icon: PlusCircle },
   { key: "overviewHistory", icon: History, href: "/cabinet/transactions" },
