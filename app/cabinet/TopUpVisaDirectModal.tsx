@@ -72,11 +72,15 @@ export function TopUpVisaDirectModal({
         aria-modal="true"
         aria-labelledby="topup-visa-direct-title"
       >
-        <div className="orb orb-teal w-72 h-72 -top-24 -left-28" aria-hidden />
-        <div className="orb orb-amber w-72 h-72 -bottom-28 -right-28" aria-hidden />
+        <div className="orb orb-teal w-72 h-72 -top-24 -left-28 opacity-40" aria-hidden />
+        <div className="orb orb-amber w-72 h-72 -bottom-28 -right-28 opacity-35" aria-hidden />
         <div className="absolute inset-0 pointer-events-none rounded-[var(--radius-lg)] border border-[rgba(0,200,150,0.10)]" aria-hidden />
 
-        <div className="sticky top-0 z-[1] flex justify-end border-b border-[var(--border)] bg-[var(--bg-card)]/95 backdrop-blur-sm px-3 py-2">
+        <div className="sticky top-0 z-[1] flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)]/95 backdrop-blur-sm px-3 py-1.5">
+          <div className="p-1.5 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)] shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+            <Logo variant="iconOnly" dark />
+          </div>
+
           <button
             type="button"
             onClick={onClose}
@@ -87,21 +91,15 @@ export function TopUpVisaDirectModal({
           </button>
         </div>
 
-        <div className="px-6 pb-8 pt-6 sm:pt-8 sm:px-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)] shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
-              <Logo variant="iconOnly" dark />
-            </div>
-          </div>
-
+        <div className="px-6 pb-8 pt-2 sm:pt-4 sm:px-8">
           <p
             id="topup-visa-direct-title"
-            className="text-base font-semibold text-[var(--text)] leading-relaxed mb-5"
+            className="text-base font-semibold text-[var(--text)] leading-relaxed mb-4"
           >
             {t("topUpVisaDirectIntro")}
           </p>
 
-          <div className="h-px bg-gradient-to-r from-[var(--accent)]/0 via-[var(--accent)]/40 to-[var(--accent)]/0 mb-5" />
+          <div className="h-px bg-gradient-to-r from-[var(--accent)]/0 via-[var(--accent)]/40 to-[var(--accent)]/0 mb-4" />
 
           <div className="space-y-3">
             <div className="flex items-baseline justify-between gap-4">
