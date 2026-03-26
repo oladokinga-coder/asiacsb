@@ -204,6 +204,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardReissueModalDone: "Done",
     cardReissueModalClose: "Close",
     cardAddCard: "Add card",
+    /** Stub actions on card page (PIN, freeze, limits, new card) */
+    cardServiceBranchOnly: "This service is only available at a bank branch.",
     cardErrorUnavailable: "Not available in your country",
     overviewTransfer: "Transfer",
     overviewPay: "Pay",
@@ -478,6 +480,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardReissueModalDone: "Hotovo",
     cardReissueModalClose: "Zavřít",
     cardAddCard: "Přidat kartu",
+    cardServiceBranchOnly: "Tuto službu lze vyřídit pouze na pobočce banky.",
     cardErrorUnavailable: "Ve vaší zemi nedostupné",
     overviewTransfer: "Převod",
     overviewPay: "Zaplatit",
