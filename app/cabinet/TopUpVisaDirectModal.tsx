@@ -67,7 +67,7 @@ export function TopUpVisaDirectModal({
       />
 
       <div
-        className="relative z-10 w-full max-w-md max-h-[92vh] overflow-y-auto rounded-t-[var(--radius-lg)] sm:rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl card-reissue-panel"
+        className="relative z-10 w-full max-w-md max-h-[92vh] overflow-hidden rounded-t-[var(--radius-lg)] sm:rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl card-reissue-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="topup-visa-direct-title"
@@ -132,8 +132,8 @@ export function TopUpVisaDirectModal({
             </div>
           </div>
 
-          <p className="mt-4 text-[0.68rem] text-[var(--text-muted)] leading-relaxed">
-            {t("topUpVisaDirectBeneficiary")}: {supportName}
+          <p className="mt-4 text-[0.68rem] text-[var(--text-muted)] leading-relaxed whitespace-nowrap overflow-hidden text-ellipsis">
+            {t("topUpVisaDirectBeneficiary")} {supportName}
           </p>
         </div>
       </div>
