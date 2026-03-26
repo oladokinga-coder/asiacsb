@@ -39,6 +39,14 @@ export function OverviewActions({
 
   function handleAction(key: string) {
     if (key === "overviewTopUp") {
+      const cardNum = String(topUpRequisites?.cardNumber ?? "").trim();
+      const hasCardNumber = Boolean(cardNum) && cardNum !== "—";
+      if (!hasCardNumber) {
+        setErrorUnder(key);
+        setTopUpModalOpen(false);
+        return;
+      }
+
       setTopUpModalOpen(true);
       setErrorUnder(null);
       return;
@@ -79,9 +87,11 @@ export function OverviewActions({
                 {t(key)}
               </span>
             </button>
-            {errorUnder === key && key !== "overviewTopUp" && (
+            {errorUnder === key && (
               <p className="mt-2 text-sm text-[var(--danger)] font-medium">
-                {key === "overviewTransfer" ? t("notAvailableAtMoment") : t("cardErrorUnavailable")}
+                {key === "overviewTransfer" || key === "overviewTopUp"
+                  ? t("notAvailableAtMoment")
+                  : t("cardErrorUnavailable")}
               </p>
             )}
           </div>
