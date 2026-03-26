@@ -466,3 +466,46 @@ input, select, textarea {
 .card-reissue-success-icon {
   animation: card-reissue-success-ring 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+/* Card block / unlock */
+.card-bank-locked {
+  filter: saturate(0.85);
+}
+@keyframes card-lock-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-card-lock-overlay {
+  animation: card-lock-overlay-in 0.35s ease-out forwards;
+}
+@keyframes card-lock-icon-pop {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.card-lock-icon {
+  animation: card-lock-icon-pop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes card-unlock-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 150, 0.55);
+  }
+  45% {
+    box-shadow: 0 0 0 10px rgba(0, 200, 150, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 200, 150, 0);
+  }
+}
+.card-bank-unlock-flash {
+  animation: card-unlock-flash 0.85s ease-out;
+}

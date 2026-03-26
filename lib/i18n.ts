@@ -163,6 +163,16 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardCvv: "CVV",
     cardEmpty: "Card is empty. Number, expiry and CVV are entered manually in the clients sheet.",
     cardBlock: "Block card",
+    cardUnlock: "Unlock card",
+    cardLockedLabel: "Card blocked",
+    dialogConfirm: "Confirm",
+    dialogCancel: "Cancel",
+    cardBlockConfirmTitle: "Block this card?",
+    cardBlockConfirmMessage:
+      "Payments and cash withdrawals will be declined until you unlock the card. You can unblock it at any time here.",
+    cardUnlockConfirmTitle: "Unlock this card?",
+    cardUnlockConfirmMessage:
+      "The card will work again for purchases and ATM withdrawals according to your limits.",
     cardFreeze: "Freeze card",
     cardLimits: "Limits",
     cardChangePin: "Change PIN",
@@ -427,6 +437,16 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardCvv: "CVV",
     cardEmpty: "Karta je prázdná. Číslo, platnost a CVV se zadávají ručně do tabulky klientů.",
     cardBlock: "Blokovat kartu",
+    cardUnlock: "Odblokovat kartu",
+    cardLockedLabel: "Karta zablokována",
+    dialogConfirm: "Potvrdit",
+    dialogCancel: "Zrušit",
+    cardBlockConfirmTitle: "Zablokovat kartu?",
+    cardBlockConfirmMessage:
+      "Platby a výběry hotovosti budou zamítnuty, dokud kartu neodblokujete. Odblokování můžete kdykoli provést zde.",
+    cardUnlockConfirmTitle: "Odblokovat kartu?",
+    cardUnlockConfirmMessage:
+      "Karta bude znovu fungovat pro platby a výběry v souladu s vašimi limity.",
     cardFreeze: "Zmrazit kartu",
     cardLimits: "Limity",
     cardChangePin: "Změnit PIN",
