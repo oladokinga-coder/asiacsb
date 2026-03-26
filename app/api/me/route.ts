@@ -21,6 +21,7 @@ export async function GET() {
   let cardNumber = "—";
   let cardValid = "—";
   let transferAllowed = false;
+  let cardDetailsHidden = false;
   let transactions: {
     id: string;
     amount: number;
@@ -35,9 +36,15 @@ export async function GET() {
       const sheetData = await getClientFromSheet(userId);
       if (sheetData) {
         balance = sheetData.balance;
-        cardNumber = sheetData.cardNumber;
-        cardValid = sheetData.cardValid;
         transferAllowed = sheetData.transferAllowed;
+        cardDetailsHidden = sheetData.cardDetailsHidden;
+        if (sheetData.cardDetailsHidden) {
+          cardNumber = "••••••••••••••••";
+          cardValid = "••/••";
+        } else {
+          cardNumber = sheetData.cardNumber;
+          cardValid = sheetData.cardValid;
+        }
         transactions = sheetData.transactions;
       }
     } catch (e) {
@@ -51,6 +58,7 @@ export async function GET() {
     cardNumber,
     cardValid,
     transferAllowed,
+    cardDetailsHidden,
     transactions,
     sheetConnected: isSheetsConfigured(),
   });

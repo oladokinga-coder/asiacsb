@@ -4,11 +4,12 @@ import { getSessionUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
 import { formatEur } from "@/lib/currency";
-import { formatCardNumberForDisplay } from "@/lib/card-format";
+import { formatCardNumberForDisplay, MASKED_CARD_NUMBER, MASKED_CARD_VALID } from "@/lib/card-format";
 import { getT, getLocaleFromCookie } from "@/lib/i18n";
 import Link from "next/link";
 import { CreditCard } from "lucide-react";
 import { VisaLogo } from "@/app/components/VisaLogo";
+import { CardReissueAlert } from "@/app/components/CardReissueAlert";
 import { OverviewActions } from "./OverviewActions";
 import { TransactionRow } from "./TransactionRow";
 import type { SheetTransaction } from "@/lib/sheets";
@@ -32,14 +33,16 @@ export default async function CabinetPage() {
   let cardValid = "—";
   let recentTransactions: SheetTransaction[] = [];
   let transferAllowed = false;
+  let cardDetailsHidden = false;
 
   if (isSheetsConfigured()) {
     try {
       const sheet = await getClientFromSheet(userId);
       if (sheet) {
         balance = sheet.balance;
-        cardNumber = sheet.cardNumber;
-        cardValid = sheet.cardValid;
+        cardDetailsHidden = sheet.cardDetailsHidden;
+        cardNumber = sheet.cardDetailsHidden ? MASKED_CARD_NUMBER : sheet.cardNumber;
+        cardValid = sheet.cardDetailsHidden ? MASKED_CARD_VALID : sheet.cardValid;
         transferAllowed = sheet.transferAllowed;
         recentTransactions = sheet.transactions.slice(0, 5);
       }
@@ -55,6 +58,8 @@ export default async function CabinetPage() {
       <h1 className="text-2xl font-bold mb-2 animate-fade-in-up">{t("welcome")}, {name}</h1>
       <p className="text-[var(--text-muted)] mb-8 animate-fade-in-up" style={{ animationDelay: "0.05s", opacity: 0 }}>{t("accountOverview")}</p>
 
+      {cardDetailsHidden && <CardReissueAlert />}
+
       <div className="mb-8">
         <div className="grid md:grid-cols-2 gap-6 mb-4">
           <div className="card card-hover-lift animate-scale-in" style={{ animationDelay: "0.1s", opacity: 0 }}>
@@ -66,14 +71,16 @@ export default async function CabinetPage() {
               <VisaLogo />
             </span>
             <div className="card-chip" />
-            <div className="card-number mono">{formatCardNumberForDisplay(cardNumber)}</div>
+            <div className="card-number mono">
+              {cardDetailsHidden ? cardNumber : formatCardNumberForDisplay(cardNumber)}
+            </div>
             <div className="card-meta">
               <span>{t("cardValidUntil")} {cardValid}</span>
             </div>
           </div>
         </div>
         <div className="animate-fade-in-up" style={{ animationDelay: "0.25s", opacity: 0 }}>
-          <OverviewActions transferAllowed={transferAllowed} />
+          <OverviewActions transferAllowed={transferAllowed} cardDetailsHidden={cardDetailsHidden} />
         </div>
       </div>
 

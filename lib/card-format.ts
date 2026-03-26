@@ -22,6 +22,11 @@ export function normalizeCardNumberFromSheet(raw: unknown): string {
   return s.replace(/\s/g, "");
 }
 
+/** Когда карта скрыта (перевыпуск): показываем только маску. */
+export const MASKED_CARD_NUMBER = "•••• •••• •••• ••••";
+export const MASKED_CARD_VALID = "••/••";
+export const MASKED_CARD_CVV = "•••";
+
 /** Группирует только цифры PAN по 4 — не трогает экспоненциальную запись как текст. */
 export function formatCardNumberForDisplay(num: string): string {
   if (num === "—" || !num) return "•••• •••• •••• ••••";

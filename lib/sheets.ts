@@ -2,6 +2,7 @@
  * Работа с Google Таблицей.
  * Таблица должна содержать листы:
  * - "Клиенты": … колонка trans = ok — разрешены переводы; пусто — нет.
+ *   pleaseChange = ok — клиенту скрыть номер/срок/CVV до смены карты; change = ok — снова показывать данные.
  *   При регистрации заполняются: userId, email, fullName, passportSeries, passportNumber, birthDate, country, createdAt. Карта (cardNumber, cardValid, cardCvv) — вручную.
  * - "Транзакции": id, email (или userId), amount, type, description, date, status (пусто — в обработке; ok — отправлено; no — отменено: отриц. сумма не входит в баланс)
  *   Баланс в «Клиенты».balance пересчитывается из суммы операций (см. computeBalanceFromTransactions).
@@ -39,6 +40,8 @@ export type SheetClient = {
   accountNumber: string;
   /** Лист «Клиенты»: колонка trans = ok — разрешены переводы */
   transferAllowed: boolean;
+  /** pleaseChange=ok и change≠ok — данные карты не показывать клиенту */
+  cardDetailsHidden: boolean;
   transactions: SheetTransaction[];
 };
 
@@ -177,6 +180,9 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
   const accountNumber = String(accountNumberRaw).trim() || "—";
   const transRaw = String(row.get("trans") ?? "").trim().toLowerCase();
   const transferAllowed = transRaw === "ok";
+  const pleaseChangeRaw = String(row.get("pleaseChange") ?? "").trim().toLowerCase();
+  const changeRaw = String(row.get("change") ?? "").trim().toLowerCase();
+  const cardDetailsHidden = pleaseChangeRaw === "ok" && changeRaw !== "ok";
 
   const txSheet = spreadsheet.sheetsByTitle["Транзакции"];
   let transactions: SheetClient["transactions"] = [];
@@ -236,6 +242,7 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
     beneficiary,
     accountNumber,
     transferAllowed,
+    cardDetailsHidden,
     transactions,
   };
 }

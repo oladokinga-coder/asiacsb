@@ -23,7 +23,13 @@ const ACTIONS: ActionItem[] = [
 const btnClass =
   "w-full flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-[var(--bg-card)] transition-colors text-[var(--text)]";
 
-export function OverviewActions({ transferAllowed }: { transferAllowed: boolean }) {
+export function OverviewActions({
+  transferAllowed,
+  cardDetailsHidden = false,
+}: {
+  transferAllowed: boolean;
+  cardDetailsHidden?: boolean;
+}) {
   const { t } = useI18n();
   const [errorUnder, setErrorUnder] = useState<string | null>(null);
 
@@ -34,8 +40,9 @@ export function OverviewActions({ transferAllowed }: { transferAllowed: boolean 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
       {ACTIONS.map(({ key, icon: Icon, href }) => {
+        const transferOk = transferAllowed && !cardDetailsHidden;
         const effectiveHref =
-          key === "overviewTransfer" && href ? (transferAllowed ? href : undefined) : href;
+          key === "overviewTransfer" && href ? (transferOk ? href : undefined) : href;
         if (effectiveHref) {
           return (
             <Link key={key} href={effectiveHref} className={btnClass}>

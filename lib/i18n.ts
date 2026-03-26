@@ -167,6 +167,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardLimits: "Limits",
     cardChangePin: "Change PIN",
     cardReissue: "Reissue card",
+    cardReissueRequiredTitle: "Card reissue required",
+    cardReissueRequiredBody:
+      "Your card must be reissued. The card number, expiry date and CVV are hidden until your bank confirms the update in the sheet (column «change» = ok).",
+    cardReissuePendingNote:
+      "Card details are hidden until the bank confirms the new card in the system.",
     cardAddCard: "Add card",
     cardErrorUnavailable: "Not available in your country",
     overviewTransfer: "Transfer",
@@ -225,6 +230,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     transferErrorGeneric: "Something went wrong. Please try again.",
     transferErrorDomesticCzkCard:
       "Domestic CZK payments require a card with a koruna balance. This card cannot be used.",
+    transferErrorCardReissue:
+      "Transfers are unavailable until your new card is confirmed. Complete the reissue process first.",
     transferRequiresSheets: "Connect Google Sheet in server settings to use transfers.",
     transferProcessingTitle: "Processing your transfer",
     transferProcessingHint: "Please do not close this page.",
@@ -403,6 +410,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardLimits: "Limity",
     cardChangePin: "Změnit PIN",
     cardReissue: "Převydat kartu",
+    cardReissueRequiredTitle: "Je nutné vydat novou kartu",
+    cardReissueRequiredBody:
+      "Vaše karta musí být převydána. Číslo karty, platnost a CVV jsou skryté, dokud banka v tabulce nepotvrdí změnu (sloupec «change» = ok).",
+    cardReissuePendingNote:
+      "Údaje na kartě jsou skryté, dokud banka v systému nepotvrdí novou kartu.",
     cardAddCard: "Přidat kartu",
     cardErrorUnavailable: "Ve vaší zemi nedostupné",
     overviewTransfer: "Převod",
@@ -461,6 +473,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     transferErrorGeneric: "Něco se pokazilo. Zkuste to znovu.",
     transferErrorDomesticCzkCard:
       "Domácí platby v CZK vyžadují kartu se zůstatkem v korunách. Tuto kartu nelze použít.",
+    transferErrorCardReissue:
+      "Převody nejsou dostupné, dokud nebude potvrzena nová karta. Nejprve dokončete převydání.",
     transferRequiresSheets: "Pro převody připojte Google tabulku v nastavení serveru.",
     transferProcessingTitle: "Zpracováváme převod",
     transferProcessingHint: "Nezavírejte prosím stránku.",

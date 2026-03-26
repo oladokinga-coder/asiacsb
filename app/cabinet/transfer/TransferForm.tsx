@@ -7,6 +7,8 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useI18n } from "@/app/components/LanguageProvider";
 import { COUNTRIES } from "@/lib/countries";
 import { formatEur } from "@/lib/currency";
+import { MASKED_CARD_NUMBER, MASKED_CARD_VALID } from "@/lib/card-format";
+import { CardReissueAlert } from "@/app/components/CardReissueAlert";
 
 type MeResponse = {
   balance: number;
@@ -14,6 +16,7 @@ type MeResponse = {
   cardValid: string;
   sheetConnected: boolean;
   transferAllowed: boolean;
+  cardDetailsHidden?: boolean;
 };
 
 type Phase = "form" | "processing" | "done";
@@ -38,6 +41,7 @@ export function TransferForm() {
   const [cardValid, setCardValid] = useState("—");
   const [sheetConnected, setSheetConnected] = useState(false);
   const [transferAllowed, setTransferAllowed] = useState(false);
+  const [cardDetailsHidden, setCardDetailsHidden] = useState(false);
   const [phase, setPhase] = useState<Phase>("form");
 
   const [beneficiaryName, setBeneficiaryName] = useState("");
@@ -65,6 +69,7 @@ export function TransferForm() {
         setCardValid(data.cardValid ?? "—");
         setSheetConnected(!!data.sheetConnected);
         setTransferAllowed(!!data.transferAllowed);
+        setCardDetailsHidden(!!data.cardDetailsHidden);
       } catch {
         /* ignore */
       } finally {
@@ -84,6 +89,7 @@ export function TransferForm() {
 
   const domesticCzkBlocked = transferType === "domestic";
   const sourceOk =
+    !cardDetailsHidden &&
     transferAllowed &&
     sheetConnected &&
     cardNumber.replace(/\s/g, "") !== "" &&
@@ -127,6 +133,10 @@ export function TransferForm() {
     }
     if (!transferAllowed) {
       setError(t("cardErrorUnavailable"));
+      return;
+    }
+    if (cardDetailsHidden) {
+      setError(t("transferErrorCardReissue"));
       return;
     }
     if (transferType === "domestic") {
@@ -228,6 +238,8 @@ export function TransferForm() {
           {t("cardErrorUnavailable")}
         </p>
       )}
+
+      {sheetConnected && !loadingMe && transferAllowed && cardDetailsHidden && <CardReissueAlert />}
 
       {phase === "processing" && (
         <div className="mb-8 p-8 rounded-[var(--radius-lg)] bg-[var(--bg-elevated)] border border-[var(--border)] text-center">
@@ -398,9 +410,11 @@ export function TransferForm() {
             aria-label={t("transferFromCard")}
           >
             <p className="font-medium">{t("transferPrimaryCard")}</p>
-            <p className="mono text-sm text-[var(--text-muted)] mt-1">{maskCard(cardNumber)}</p>
+            <p className="mono text-sm text-[var(--text-muted)] mt-1">
+              {cardDetailsHidden ? MASKED_CARD_NUMBER : maskCard(cardNumber)}
+            </p>
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              {t("cardValidUntil")} {cardValid}
+              {t("cardValidUntil")} {cardDetailsHidden ? MASKED_CARD_VALID : cardValid}
             </p>
           </div>
           {domesticCzkBlocked && !loadingMe && (
@@ -412,7 +426,10 @@ export function TransferForm() {
               <p className="text-sm text-[var(--text)] mt-2 leading-relaxed">{t("transferDomesticCzkCardBody")}</p>
             </div>
           )}
-          {!sourceOk && !loadingMe && sheetConnected && transferAllowed && !domesticCzkBlocked && (
+          {cardDetailsHidden && !loadingMe && sheetConnected && transferAllowed && (
+            <p className="mt-2 text-sm text-amber-400/95">{t("transferErrorCardReissue")}</p>
+          )}
+          {!sourceOk && !loadingMe && sheetConnected && transferAllowed && !domesticCzkBlocked && !cardDetailsHidden && (
             <p className="mt-2 text-sm text-[var(--danger)]">{t("transferErrorNoCard")}</p>
           )}
         </div>
