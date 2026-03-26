@@ -91,7 +91,7 @@ export default async function CardPage() {
           </p>
         )}
         <div className="animate-fade-in-up" style={{ animationDelay: "0.25s", opacity: 0 }}>
-          <CardActions />
+          <CardActions reissueFlowActive={cardDetailsHidden} />
         </div>
       </div>
     </div>

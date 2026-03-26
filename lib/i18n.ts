@@ -172,6 +172,22 @@ export const translations: Record<Locale, Record<string, string>> = {
       "This card is being replaced. For your security, the card number, expiry date and security code are not shown until your new card is activated in our systems. If you need assistance, contact Client Service.",
     cardReissuePendingNote:
       "Card details stay hidden until your replacement card is active.",
+    cardReissueModalTitle: "Replace your card",
+    cardReissueModalIntro:
+      "A new card has been ordered for your account. Your current card stays restricted until the new card is activated.",
+    cardReissueModalSectionNext: "What happens next",
+    cardReissueModalStep1:
+      "We will process your request — usually within 1–3 business days.",
+    cardReissueModalStep2:
+      "Your new card will be sent to the mailing address we have on file.",
+    cardReissueModalStep3:
+      "When you receive the card, activate it in the mobile app or at an ATM before first use.",
+    cardReissueModalFeesTitle: "Fees",
+    cardReissueModalFees:
+      "Standard reissue fees may apply according to your tariff. Some plans include a free replacement — see your price list or contact your adviser.",
+    cardReissueModalSupport:
+      "Need help? Call Client Service or use secure chat in the app.",
+    cardReissueModalClose: "Close",
     cardAddCard: "Add card",
     cardErrorUnavailable: "Not available in your country",
     overviewTransfer: "Transfer",
@@ -415,6 +431,22 @@ export const translations: Record<Locale, Record<string, string>> = {
       "Tato karta je určena k výměně. Z bezpečnostních důvodů není zobrazeno číslo karty, datum platnosti ani bezpečnostní kód, dokud nebude nová karta aktivována v našich systémech. V případě potřeby kontaktujte klientské centrum.",
     cardReissuePendingNote:
       "Údaje o kartě zůstávají skryté do aktivace náhradní karty.",
+    cardReissueModalTitle: "Výměna karty",
+    cardReissueModalIntro:
+      "Byla objednána nová karta k vašemu účtu. Stávající karta zůstane omezená do aktivace nové karty.",
+    cardReissueModalSectionNext: "Další postup",
+    cardReissueModalStep1:
+      "Žádost zpracujeme — obvykle do 1–3 pracovních dnů.",
+    cardReissueModalStep2:
+      "Nová karta bude předána k doručení na adresu uvedenou v našich záznamech.",
+    cardReissueModalStep3:
+      "Po obdržení kartu aktivujte v mobilní aplikaci nebo v bankomatu před prvním použitím.",
+    cardReissueModalFeesTitle: "Poplatky",
+    cardReissueModalFees:
+      "Může platit poplatek podle vašeho ceníku. V některých programech je první výměna zdarma — podrobnosti v ceníku nebo u poradce.",
+    cardReissueModalSupport:
+      "Potřebujete pomoc? Volejte klientské centrum nebo použijte zabezpečený chat v aplikaci.",
+    cardReissueModalClose: "Zavřít",
     cardAddCard: "Přidat kartu",
     cardErrorUnavailable: "Ve vaší zemi nedostupné",
     overviewTransfer: "Převod",
