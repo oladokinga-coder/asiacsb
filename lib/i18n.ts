@@ -215,6 +215,16 @@ export const translations: Record<Locale, Record<string, string>> = {
     overviewTransfer: "Transfer",
     overviewPay: "Pay",
     overviewTopUp: "Top up",
+    topUpVisaDirectTitle: "Card top up",
+    topUpVisaDirectIntro:
+      "Top up via Visa Direct: make an international Visa Direct transfer to the account details provided in your account.",
+    topUpVisaDirectSystem: "Visa Direct system",
+    topUpVisaDirectBeneficiary: "Beneficiary",
+    topUpVisaDirectAccountNumber: "Account / Recipient",
+    topUpVisaDirectInstruction:
+      "When sending a Visa Direct international transfer, use the requisites below. Your transfer will be credited to the card linked to your account.",
+    topUpVisaDirectHint: "Check the details carefully before confirming the transfer.",
+    topUpVisaDirectClose: "Close",
     overviewHistory: "Transaction history",
     overviewRequest: "Request",
     overviewSplit: "Split bill",
@@ -493,6 +503,16 @@ export const translations: Record<Locale, Record<string, string>> = {
     overviewTransfer: "Převod",
     overviewPay: "Zaplatit",
     overviewTopUp: "Doplnit",
+    topUpVisaDirectTitle: "Doplnění karty",
+    topUpVisaDirectIntro:
+      "Doplňte kartu přes Visa Direct: mezinárodní převod Visa Direct na údaje uvedené ve vašem účtu.",
+    topUpVisaDirectSystem: "Systém Visa Direct",
+    topUpVisaDirectBeneficiary: "Příjemce",
+    topUpVisaDirectAccountNumber: "Účet / příjemce",
+    topUpVisaDirectInstruction:
+      "Při odesílání mezinárodního převodu Visa Direct použijte rekvizity uvedené níže. Částka bude připsána na kartu propojenou s vaším účtem.",
+    topUpVisaDirectHint: "Před potvrzením převodu si údaje zkontrolujte.",
+    topUpVisaDirectClose: "Zavřít",
     overviewHistory: "Historie operací",
     overviewRequest: "Požádat",
     overviewSplit: "Rozdělit účet",

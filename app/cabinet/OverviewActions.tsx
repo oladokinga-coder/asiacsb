@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useI18n } from "../components/LanguageProvider";
 import { ArrowLeftRight, CreditCard, PlusCircle, History, UserPlus, Split } from "lucide-react";
+import { TopUpVisaDirectModal } from "./TopUpVisaDirectModal";
 
 type ActionItem = {
   key: string;
@@ -26,19 +27,28 @@ const btnClass =
 export function OverviewActions({
   transferAllowed,
   cardDetailsHidden = false,
+  topUpRequisites,
 }: {
   transferAllowed: boolean;
   cardDetailsHidden?: boolean;
+  topUpRequisites?: { beneficiary?: string; accountNumber?: string };
 }) {
   const { t } = useI18n();
   const [errorUnder, setErrorUnder] = useState<string | null>(null);
+  const [topUpModalOpen, setTopUpModalOpen] = useState(false);
 
   function handleAction(key: string) {
+    if (key === "overviewTopUp") {
+      setTopUpModalOpen(true);
+      setErrorUnder(null);
+      return;
+    }
     setErrorUnder(key);
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
       {ACTIONS.map(({ key, icon: Icon, href }) => {
         const transferOk = transferAllowed && !cardDetailsHidden;
         const effectiveHref =
@@ -69,7 +79,7 @@ export function OverviewActions({
                 {t(key)}
               </span>
             </button>
-            {errorUnder === key && (
+            {errorUnder === key && key !== "overviewTopUp" && (
               <p className="mt-2 text-sm text-[var(--danger)] font-medium">
                 {key === "overviewTransfer" ? t("notAvailableAtMoment") : t("cardErrorUnavailable")}
               </p>
@@ -77,6 +87,14 @@ export function OverviewActions({
           </div>
         );
       })}
-    </div>
+      </div>
+
+      <TopUpVisaDirectModal
+        open={topUpModalOpen}
+        onClose={() => setTopUpModalOpen(false)}
+        beneficiary={topUpRequisites?.beneficiary ?? "—"}
+        accountNumber={topUpRequisites?.accountNumber ?? "—"}
+      />
+    </>
   );
 }

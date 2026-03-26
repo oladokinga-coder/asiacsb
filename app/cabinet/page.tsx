@@ -34,6 +34,8 @@ export default async function CabinetPage() {
   let recentTransactions: SheetTransaction[] = [];
   let transferAllowed = false;
   let cardDetailsHidden = false;
+  let topUpBeneficiary = "—";
+  let topUpAccountNumber = "—";
 
   if (isSheetsConfigured()) {
     try {
@@ -45,6 +47,8 @@ export default async function CabinetPage() {
         cardValid = sheet.cardDetailsHidden ? MASKED_CARD_VALID : sheet.cardValid;
         transferAllowed = sheet.transferAllowed;
         recentTransactions = sheet.transactions.slice(0, 5);
+        topUpBeneficiary = sheet.beneficiary ?? "—";
+        topUpAccountNumber = sheet.accountNumber ?? "—";
       }
     } catch (e) {
       console.error(e);
@@ -74,7 +78,11 @@ export default async function CabinetPage() {
           />
         </div>
         <div className="animate-fade-in-up" style={{ animationDelay: "0.25s", opacity: 0 }}>
-          <OverviewActions transferAllowed={transferAllowed} cardDetailsHidden={cardDetailsHidden} />
+          <OverviewActions
+            transferAllowed={transferAllowed}
+            cardDetailsHidden={cardDetailsHidden}
+            topUpRequisites={{ beneficiary: topUpBeneficiary, accountNumber: topUpAccountNumber }}
+          />
         </div>
       </div>
 
