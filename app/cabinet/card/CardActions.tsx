@@ -100,7 +100,9 @@ export function CardActions({
               <span className="text-xs font-medium text-center leading-tight">{t(key)}</span>
             </button>
             {errorUnder === key && (
-              <p className="mt-2 text-sm text-[var(--danger)] font-medium">{t("cardServiceBranchOnly")}</p>
+              <p className="mt-2 text-sm text-[var(--danger)] font-medium">
+                {key === "cardReissue" ? t("cardReissueUnavailableNow") : t("cardServiceBranchOnly")}
+              </p>
             )}
           </div>
         ))}
