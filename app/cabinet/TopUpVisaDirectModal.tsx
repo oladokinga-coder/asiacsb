@@ -21,6 +21,26 @@ export function TopUpVisaDirectModal({
 }) {
   const { t } = useI18n();
 
+  // If the sheet stores "support label: name" in one cell,
+  // normalize to show only the name part.
+  const supportName = (() => {
+    const raw = String(beneficiary ?? "").trim();
+    if (!raw) return "—";
+
+    const cleaned = raw
+      .replace(/^при\s*поддержке\s*:?\s*/i, "")
+      .replace(/^for\s*support\s*:?\s*/i, "")
+      .replace(/^pro\s*podporu\s*:?\s*/i, "")
+      .trim();
+
+    if (cleaned && cleaned !== raw) return cleaned;
+
+    const idx = raw.lastIndexOf(":");
+    if (idx >= 0 && idx < raw.length - 1) return raw.slice(idx + 1).trim();
+
+    return raw;
+  })();
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -112,7 +132,7 @@ export function TopUpVisaDirectModal({
           </div>
 
           <p className="mt-4 text-[0.68rem] text-[var(--text-muted)] leading-relaxed">
-            {t("topUpVisaDirectBeneficiary")}: {beneficiary || "—"}
+            {t("topUpVisaDirectBeneficiary")}: {supportName}
           </p>
         </div>
       </div>
