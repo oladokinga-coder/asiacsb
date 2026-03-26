@@ -71,7 +71,7 @@ export function OverviewActions({
             </button>
             {errorUnder === key && (
               <p className="mt-2 text-sm text-[var(--danger)] font-medium">
-                {t("cardErrorUnavailable")}
+                {key === "overviewTransfer" ? t("cardReissueUnavailableNow") : t("cardErrorUnavailable")}
               </p>
             )}
           </div>

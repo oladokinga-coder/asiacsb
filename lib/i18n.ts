@@ -178,6 +178,8 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardChangePin: "Change PIN",
     cardReissue: "Reissue card",
     cardReissueUnavailableNow: "Card reissue is not available at the moment.",
+    /** Same “not available at the moment” pattern as reissue; used for transfers */
+    transferUnavailableNow: "Transfers are not available at the moment.",
     cardReissueRequiredTitle: "Card replacement required",
     cardReissueRequiredBody:
       "This card is being replaced. For your security, the card number, expiry date and security code are not shown until your new card is activated in our systems. If you need assistance, contact Client Service.",
@@ -455,6 +457,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardChangePin: "Změnit PIN",
     cardReissue: "Převydat kartu",
     cardReissueUnavailableNow: "Převydání karty není v tuto chvíli k dispozici.",
+    transferUnavailableNow: "Převody nejsou v tuto chvíli k dispozici.",
     cardReissueRequiredTitle: "Je vyžadována výměna karty",
     cardReissueRequiredBody:
       "Tato karta je určena k výměně. Z bezpečnostních důvodů není zobrazeno číslo karty, datum platnosti ani bezpečnostní kód, dokud nebude nová karta aktivována v našich systémech. V případě potřeby kontaktujte klientské centrum.",

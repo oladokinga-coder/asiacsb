@@ -111,7 +111,7 @@ export function TransferForm() {
       case "NO_CLIENT_ROW":
         return t("transferErrorNoRow");
       case "TRANSFER_NOT_ALLOWED":
-        return t("cardErrorUnavailable");
+        return t("transferUnavailableNow");
       case "INVALID_IBAN":
         return t("transferErrorIban");
       case "INVALID_BIC":
@@ -132,7 +132,7 @@ export function TransferForm() {
       return;
     }
     if (!transferAllowed) {
-      setError(t("cardErrorUnavailable"));
+      setError(t("transferUnavailableNow"));
       return;
     }
     if (cardDetailsHidden) {
@@ -235,7 +235,7 @@ export function TransferForm() {
 
       {sheetConnected && !loadingMe && !transferAllowed && (
         <p className="mb-6 p-4 rounded-[var(--radius)] bg-[var(--danger)]/10 border border-[var(--danger)]/30 text-[var(--danger)] text-sm font-medium">
-          {t("cardErrorUnavailable")}
+          {t("transferUnavailableNow")}
         </p>
       )}
 
