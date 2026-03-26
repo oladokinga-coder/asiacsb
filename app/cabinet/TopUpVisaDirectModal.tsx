@@ -7,13 +7,15 @@ import { useI18n } from "@/app/components/LanguageProvider";
 export function TopUpVisaDirectModal({
   open,
   onClose,
+  clientName,
+  cardNumber,
   beneficiary,
-  accountNumber,
 }: {
   open: boolean;
   onClose: () => void;
+  clientName: string;
+  cardNumber: string;
   beneficiary: string;
-  accountNumber: string;
 }) {
   const { t } = useI18n();
 
@@ -74,14 +76,18 @@ export function TopUpVisaDirectModal({
               <dd className="font-medium">Visa Direct</dd>
             </div>
             <div className="flex justify-between gap-4 items-baseline">
-              <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectBeneficiary")}</dt>
-              <dd className="font-medium text-right break-all">{beneficiary || "—"}</dd>
+              <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectClientName")}</dt>
+              <dd className="font-medium text-right break-all">{clientName || "—"}</dd>
             </div>
             <div className="flex justify-between gap-4 items-baseline">
-              <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectAccountNumber")}</dt>
-              <dd className="font-mono text-right text-xs sm:text-sm break-all">{accountNumber || "—"}</dd>
+              <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectCardNumber")}</dt>
+              <dd className="font-mono text-right text-xs sm:text-sm break-all">{cardNumber || "—"}</dd>
             </div>
           </dl>
+
+          <p className="mt-3 text-[0.7rem] text-[var(--text-muted)] leading-relaxed">
+            {t("topUpVisaDirectBeneficiary")}: {beneficiary || "—"}
+          </p>
 
           <div className="mt-6 p-4 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)]">
             <p className="text-sm leading-relaxed">{t("topUpVisaDirectInstruction")}</p>

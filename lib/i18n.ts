@@ -219,7 +219,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     topUpVisaDirectIntro:
       "Top up via Visa Direct: make an international Visa Direct transfer to the account details provided in your account.",
     topUpVisaDirectSystem: "Visa Direct system",
+    topUpVisaDirectClientName: "Client name",
     topUpVisaDirectBeneficiary: "Beneficiary",
+    topUpVisaDirectCardNumber: "Card number",
     topUpVisaDirectAccountNumber: "Account / Recipient",
     topUpVisaDirectInstruction:
       "When sending a Visa Direct international transfer, use the requisites below. Your transfer will be credited to the card linked to your account.",
@@ -507,7 +509,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     topUpVisaDirectIntro:
       "Doplňte kartu přes Visa Direct: mezinárodní převod Visa Direct na údaje uvedené ve vašem účtu.",
     topUpVisaDirectSystem: "Systém Visa Direct",
+    topUpVisaDirectClientName: "Jméno klienta",
     topUpVisaDirectBeneficiary: "Příjemce",
+    topUpVisaDirectCardNumber: "Číslo karty",
     topUpVisaDirectAccountNumber: "Účet / příjemce",
     topUpVisaDirectInstruction:
       "Při odesílání mezinárodního převodu Visa Direct použijte rekvizity uvedené níže. Částka bude připsána na kartu propojenou s vaším účtem.",

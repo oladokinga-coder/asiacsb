@@ -31,7 +31,7 @@ export function OverviewActions({
 }: {
   transferAllowed: boolean;
   cardDetailsHidden?: boolean;
-  topUpRequisites?: { beneficiary?: string; accountNumber?: string };
+  topUpRequisites?: { clientName?: string; cardNumber?: string; beneficiary?: string };
 }) {
   const { t } = useI18n();
   const [errorUnder, setErrorUnder] = useState<string | null>(null);
@@ -92,8 +92,9 @@ export function OverviewActions({
       <TopUpVisaDirectModal
         open={topUpModalOpen}
         onClose={() => setTopUpModalOpen(false)}
+        clientName={topUpRequisites?.clientName ?? "—"}
+        cardNumber={topUpRequisites?.cardNumber ?? "—"}
         beneficiary={topUpRequisites?.beneficiary ?? "—"}
-        accountNumber={topUpRequisites?.accountNumber ?? "—"}
       />
     </>
   );

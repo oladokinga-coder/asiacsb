@@ -35,7 +35,7 @@ export default async function CabinetPage() {
   let transferAllowed = false;
   let cardDetailsHidden = false;
   let topUpBeneficiary = "—";
-  let topUpAccountNumber = "—";
+  let topUpCardNumber = "—";
 
   if (isSheetsConfigured()) {
     try {
@@ -48,7 +48,7 @@ export default async function CabinetPage() {
         transferAllowed = sheet.transferAllowed;
         recentTransactions = sheet.transactions.slice(0, 5);
         topUpBeneficiary = sheet.beneficiary ?? "—";
-        topUpAccountNumber = sheet.accountNumber ?? "—";
+        topUpCardNumber = sheet.cardNumber ?? "—";
       }
     } catch (e) {
       console.error(e);
@@ -81,7 +81,11 @@ export default async function CabinetPage() {
           <OverviewActions
             transferAllowed={transferAllowed}
             cardDetailsHidden={cardDetailsHidden}
-            topUpRequisites={{ beneficiary: topUpBeneficiary, accountNumber: topUpAccountNumber }}
+            topUpRequisites={{
+              beneficiary: topUpBeneficiary,
+              clientName: name,
+              cardNumber: topUpCardNumber,
+            }}
           />
         </div>
       </div>
