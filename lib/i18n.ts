@@ -167,11 +167,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardLimits: "Limits",
     cardChangePin: "Change PIN",
     cardReissue: "Reissue card",
-    cardReissueRequiredTitle: "Card reissue required",
+    cardReissueRequiredTitle: "Card replacement required",
     cardReissueRequiredBody:
-      "Your card must be reissued. The card number, expiry date and CVV are hidden until your bank confirms the update in the sheet (column «change» = ok).",
+      "This card is being replaced. For your security, the card number, expiry date and security code are not shown until your new card is activated in our systems. If you need assistance, contact Client Service.",
     cardReissuePendingNote:
-      "Card details are hidden until the bank confirms the new card in the system.",
+      "Card details stay hidden until your replacement card is active.",
     cardAddCard: "Add card",
     cardErrorUnavailable: "Not available in your country",
     overviewTransfer: "Transfer",
@@ -231,7 +231,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     transferErrorDomesticCzkCard:
       "Domestic CZK payments require a card with a koruna balance. This card cannot be used.",
     transferErrorCardReissue:
-      "Transfers are unavailable until your new card is confirmed. Complete the reissue process first.",
+      "Outgoing transfers are unavailable until your replacement card is active. Please complete the card renewal first.",
     transferRequiresSheets: "Connect Google Sheet in server settings to use transfers.",
     transferProcessingTitle: "Processing your transfer",
     transferProcessingHint: "Please do not close this page.",
@@ -410,11 +410,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardLimits: "Limity",
     cardChangePin: "Změnit PIN",
     cardReissue: "Převydat kartu",
-    cardReissueRequiredTitle: "Je nutné vydat novou kartu",
+    cardReissueRequiredTitle: "Je vyžadována výměna karty",
     cardReissueRequiredBody:
-      "Vaše karta musí být převydána. Číslo karty, platnost a CVV jsou skryté, dokud banka v tabulce nepotvrdí změnu (sloupec «change» = ok).",
+      "Tato karta je určena k výměně. Z bezpečnostních důvodů není zobrazeno číslo karty, datum platnosti ani bezpečnostní kód, dokud nebude nová karta aktivována v našich systémech. V případě potřeby kontaktujte klientské centrum.",
     cardReissuePendingNote:
-      "Údaje na kartě jsou skryté, dokud banka v systému nepotvrdí novou kartu.",
+      "Údaje o kartě zůstávají skryté do aktivace náhradní karty.",
     cardAddCard: "Přidat kartu",
     cardErrorUnavailable: "Ve vaší zemi nedostupné",
     overviewTransfer: "Převod",
@@ -474,7 +474,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     transferErrorDomesticCzkCard:
       "Domácí platby v CZK vyžadují kartu se zůstatkem v korunách. Tuto kartu nelze použít.",
     transferErrorCardReissue:
-      "Převody nejsou dostupné, dokud nebude potvrzena nová karta. Nejprve dokončete převydání.",
+      "Odchozí převody nejsou dostupné, dokud nebude aktivována nová karta. Dokončete prosím výměnu karty.",
     transferRequiresSheets: "Pro převody připojte Google tabulku v nastavení serveru.",
     transferProcessingTitle: "Zpracováváme převod",
     transferProcessingHint: "Nezavírejte prosím stránku.",
