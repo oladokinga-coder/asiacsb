@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useI18n } from "../../components/LanguageProvider";
-import { Lock, Snowflake, Sliders, KeyRound, RefreshCw, CreditCard, Unlock } from "lucide-react";
+import { Lock, Wallet, Sliders, KeyRound, RefreshCw, CreditCard, Unlock } from "lucide-react";
 import { CardReissueBankModal } from "@/app/components/CardReissueBankModal";
 
 const OTHER_ACTIONS = [
-  { key: "cardFreeze", icon: Snowflake },
+  { key: "cardApplePay", icon: Wallet },
   { key: "cardLimits", icon: Sliders },
   { key: "cardChangePin", icon: KeyRound },
   { key: "cardReissue", icon: RefreshCw },
@@ -101,7 +101,11 @@ export function CardActions({
             </button>
             {errorUnder === key && (
               <p className="mt-2 text-sm text-[var(--danger)] font-medium">
-                {key === "cardReissue" ? t("cardReissueUnavailableNow") : t("cardServiceBranchOnly")}
+                {key === "cardReissue"
+                  ? t("cardReissueUnavailableNow")
+                  : key === "cardApplePay"
+                    ? t("cardErrorUnavailable")
+                    : t("cardServiceBranchOnly")}
               </p>
             )}
           </div>

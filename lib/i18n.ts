@@ -173,7 +173,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardUnlockConfirmTitle: "Unlock this card?",
     cardUnlockConfirmMessage:
       "The card will work again for purchases and ATM withdrawals according to your limits.",
-    cardFreeze: "Freeze card",
+    cardApplePay: "Apple Pay",
     cardLimits: "Limits",
     cardChangePin: "Change PIN",
     cardReissue: "Reissue card",
@@ -450,7 +450,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     cardUnlockConfirmTitle: "Odblokovat kartu?",
     cardUnlockConfirmMessage:
       "Karta bude znovu fungovat pro platby a výběry v souladu s vašimi limity.",
-    cardFreeze: "Zmrazit kartu",
+    cardApplePay: "Apple Pay",
     cardLimits: "Limity",
     cardChangePin: "Změnit PIN",
     cardReissue: "Převydat kartu",
