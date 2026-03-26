@@ -4,5 +4,6 @@ node_modules
 .env.local
 *.db
 .DS_Store
+*.tsbuildinfo
 public/uploads
 чех банк с нуля/

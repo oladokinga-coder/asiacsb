@@ -51,6 +51,7 @@ export default async function CardPage() {
   return (
     <div className="container py-8">
       <CardPageInteractive
+        userId={userId}
         name={name}
         cardNumber={cardNumber}
         cardValid={cardValid}

@@ -4,12 +4,12 @@ import { getSessionUserId } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
 import { formatEur } from "@/lib/currency";
-import { formatCardNumberForDisplay, MASKED_CARD_NUMBER, MASKED_CARD_VALID } from "@/lib/card-format";
+import { MASKED_CARD_NUMBER, MASKED_CARD_VALID } from "@/lib/card-format";
 import { getT, getLocaleFromCookie } from "@/lib/i18n";
 import Link from "next/link";
 import { CreditCard } from "lucide-react";
-import { VisaLogo } from "@/app/components/VisaLogo";
 import { CardReissueAlert } from "@/app/components/CardReissueAlert";
+import { CabinetPreviewCard } from "./CabinetPreviewCard";
 import { OverviewActions } from "./OverviewActions";
 import { TransactionRow } from "./TransactionRow";
 import type { SheetTransaction } from "@/lib/sheets";
@@ -66,18 +66,12 @@ export default async function CabinetPage() {
             <p className="text-sm text-[var(--text-muted)] mb-1">{t("balance")}</p>
             <p className="text-3xl font-bold mono">{formatEur(balance)}</p>
           </div>
-          <div className="bank-card animate-float animate-scale-in" style={{ animationDelay: "0.2s", opacity: 0 }}>
-            <span className="card-logo">
-              <VisaLogo />
-            </span>
-            <div className="card-chip" />
-            <div className="card-number mono">
-              {cardDetailsHidden ? cardNumber : formatCardNumberForDisplay(cardNumber)}
-            </div>
-            <div className="card-meta">
-              <span>{t("cardValidUntil")} {cardValid}</span>
-            </div>
-          </div>
+          <CabinetPreviewCard
+            userId={userId}
+            cardNumber={cardNumber}
+            cardValid={cardValid}
+            cardDetailsHidden={cardDetailsHidden}
+          />
         </div>
         <div className="animate-fade-in-up" style={{ animationDelay: "0.25s", opacity: 0 }}>
           <OverviewActions transferAllowed={transferAllowed} cardDetailsHidden={cardDetailsHidden} />
