@@ -62,13 +62,9 @@ export function TopUpVisaDirectModal({
         </div>
 
         <div className="px-6 pb-8 pt-2 sm:pt-8 sm:px-8">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[var(--accent)] mb-1">{t("bankName")}</p>
-          <h2 id="topup-visa-direct-title" className="text-xl font-bold tracking-tight mb-1">
-            {t("topUpVisaDirectTitle")}
-          </h2>
-          <p className="text-sm text-[var(--text-muted)] mb-6 leading-relaxed">{t("topUpVisaDirectIntro")}</p>
-
-          <div className="h-px border-t border-dashed border-[var(--border)] mb-6" />
+          <p id="topup-visa-direct-title" className="text-sm font-medium text-[var(--text-muted)] mb-4 leading-relaxed">
+            {t("topUpVisaDirectIntro")}
+          </p>
 
           <dl className="space-y-3 text-sm">
             <div className="flex justify-between gap-4 items-baseline">
@@ -77,24 +73,16 @@ export function TopUpVisaDirectModal({
             </div>
             <div className="flex justify-between gap-4 items-baseline">
               <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectClientName")}</dt>
-              <dd className="font-medium text-right break-all">{clientName || "—"}</dd>
+              <dd className="font-medium break-all">{clientName || "—"}</dd>
             </div>
             <div className="flex justify-between gap-4 items-baseline">
               <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectCardNumber")}</dt>
-              <dd className="font-mono text-right text-xs sm:text-sm break-all">{cardNumber || "—"}</dd>
+              <dd className="font-mono break-all">{cardNumber || "—"}</dd>
             </div>
           </dl>
 
           <p className="mt-3 text-[0.7rem] text-[var(--text-muted)] leading-relaxed">
             {t("topUpVisaDirectBeneficiary")}: {beneficiary || "—"}
-          </p>
-
-          <div className="mt-6 p-4 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)]">
-            <p className="text-sm leading-relaxed">{t("topUpVisaDirectInstruction")}</p>
-          </div>
-
-          <p className="mt-4 text-xs text-[var(--text-muted)] leading-relaxed">
-            {t("topUpVisaDirectHint")}
           </p>
         </div>
       </div>
