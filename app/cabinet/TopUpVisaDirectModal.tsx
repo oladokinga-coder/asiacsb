@@ -77,8 +77,11 @@ export function TopUpVisaDirectModal({
         <div className="absolute inset-0 pointer-events-none rounded-[var(--radius-lg)] border border-[rgba(0,200,150,0.10)]" aria-hidden />
 
         <div className="sticky top-0 z-[1] flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)]/95 backdrop-blur-sm px-3 py-1.5">
-          <div className="p-1.5 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)] shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+          <div className="flex items-center gap-2 min-w-0">
             <Logo variant="iconOnly" dark />
+            <span className="text-sm font-semibold tracking-tight text-[var(--text)] truncate">
+              {t("bankName")}
+            </span>
           </div>
 
           <button
