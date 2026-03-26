@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import { useI18n } from "@/app/components/LanguageProvider";
 import { createPortal } from "react-dom";
+import { Logo } from "@/app/components/Logo";
 
 export function TopUpVisaDirectModal({
   open,
@@ -67,6 +68,12 @@ export function TopUpVisaDirectModal({
         </div>
 
         <div className="px-6 pb-8 pt-6 sm:pt-8 sm:px-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-[var(--radius)] bg-[var(--bg-elevated)] border border-[var(--border)] shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+              <Logo variant="iconOnly" dark />
+            </div>
+          </div>
+
           <p
             id="topup-visa-direct-title"
             className="text-base font-semibold text-[var(--text)] leading-relaxed mb-5"
