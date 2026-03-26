@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
 import { useI18n } from "@/app/components/LanguageProvider";
+import { createPortal } from "react-dom";
 
 export function TopUpVisaDirectModal({
   open,
@@ -35,7 +36,7 @@ export function TopUpVisaDirectModal({
 
   if (!open) return null;
 
-  return (
+  const modal = (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4" role="presentation">
       <button
         type="button"
@@ -88,5 +89,9 @@ export function TopUpVisaDirectModal({
       </div>
     </div>
   );
+
+  // Render into document.body to avoid stacking-context issues with parent animations/opacity.
+  if (typeof document === "undefined") return modal;
+  return createPortal(modal, document.body);
 }
 
