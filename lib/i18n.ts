@@ -174,19 +174,24 @@ export const translations: Record<Locale, Record<string, string>> = {
       "Card details stay hidden until your replacement card is active.",
     cardReissueModalTitle: "Replace your card",
     cardReissueModalIntro:
-      "A new card has been ordered for your account. Your current card stays restricted until the new card is activated.",
-    cardReissueModalSectionNext: "What happens next",
+      "A new card has been ordered for your account. Your current card remains restricted until the new card is activated.",
+    cardReissueModalSectionNext: "What will happen next",
     cardReissueModalStep1:
-      "We will process your request — usually within 1–3 business days.",
+      "We will process your request — as a rule, within 1–3 hours.",
     cardReissueModalStep2:
-      "Your new card will be sent to the mailing address we have on file.",
+      "Your new card will be active for online use only. To obtain a physical card, a personal visit to a branch is required.",
     cardReissueModalStep3:
-      "When you receive the card, activate it in the mobile app or at an ATM before first use.",
+      "Only you may use the card. PIN, 3D Secure and limits protect you from unauthorised use. Do not disclose your card, PIN or codes to third parties.",
     cardReissueModalFeesTitle: "Fees",
     cardReissueModalFees:
-      "Standard reissue fees may apply according to your tariff. Some plans include a free replacement — see your price list or contact your adviser.",
+      "Fees may apply in accordance with your tariff. For details, see your price list or contact Client Service.",
     cardReissueModalSupport:
-      "Need help? Call Client Service or use secure chat in the app.",
+      "For assistance, contact Client Service by phone or via secure chat in the app.",
+    cardReissueModalSubmit: "Reissue card",
+    cardReissueModalSuccessTitle: "Request submitted",
+    cardReissueModalSuccessBody:
+      "Your reissue request has been registered. You will be notified of further steps in accordance with bank procedures.",
+    cardReissueModalDone: "Done",
     cardReissueModalClose: "Close",
     cardAddCard: "Add card",
     cardErrorUnavailable: "Not available in your country",
@@ -433,19 +438,24 @@ export const translations: Record<Locale, Record<string, string>> = {
       "Údaje o kartě zůstávají skryté do aktivace náhradní karty.",
     cardReissueModalTitle: "Výměna karty",
     cardReissueModalIntro:
-      "Byla objednána nová karta k vašemu účtu. Stávající karta zůstane omezená do aktivace nové karty.",
-    cardReissueModalSectionNext: "Další postup",
+      "K vašemu účtu byla objednána nová karta. Stávající karta zůstane omezená do aktivace nové karty.",
+    cardReissueModalSectionNext: "Co se bude dít dál",
     cardReissueModalStep1:
-      "Žádost zpracujeme — obvykle do 1–3 pracovních dnů.",
+      "Vaši žádost zpracujeme — zpravidla do 1–3 hodin.",
     cardReissueModalStep2:
-      "Nová karta bude předána k doručení na adresu uvedenou v našich záznamech.",
+      "Nová karta bude aktivní pouze pro online použití. K vyzvednutí plastové karty je nutná osobní návštěva pobočky banky.",
     cardReissueModalStep3:
-      "Po obdržení kartu aktivujte v mobilní aplikaci nebo v bankomatu před prvním použitím.",
+      "Kartu smí používat výhradně vy. PIN, 3D Secure a limity chrání před zneužitím. Nikdy neposkytujte kartu, PIN ani kódy třetím osobám.",
     cardReissueModalFeesTitle: "Poplatky",
     cardReissueModalFees:
-      "Může platit poplatek podle vašeho ceníku. V některých programech je první výměna zdarma — podrobnosti v ceníku nebo u poradce.",
+      "Poplatky se řídí vaším ceníkem. Podrobnosti naleznete v ceníku nebo u klientského centra.",
     cardReissueModalSupport:
-      "Potřebujete pomoc? Volejte klientské centrum nebo použijte zabezpečený chat v aplikaci.",
+      "V případě dotazů kontaktujte klientské centrum telefonicky nebo prostřednictvím zabezpečeného chatu v aplikaci.",
+    cardReissueModalSubmit: "Převydat kartu",
+    cardReissueModalSuccessTitle: "Žádost přijata",
+    cardReissueModalSuccessBody:
+      "Vaše žádost o převydání karty byla zaregistrována. O dalším postupu vás budeme informovat v souladu s bankovními postupy.",
+    cardReissueModalDone: "Hotovo",
     cardReissueModalClose: "Zavřít",
     cardAddCard: "Přidat kartu",
     cardErrorUnavailable: "Ve vaší zemi nedostupné",
