@@ -6,6 +6,8 @@ import { getClientFromSheet, isSheetsConfigured } from "@/lib/sheets";
 import { formatEur } from "@/lib/currency";
 import { getT, getLocaleFromCookie, LOCALE_INTL } from "@/lib/i18n";
 import { COUNTRIES } from "@/lib/countries";
+import { MASKED_SENSITIVE } from "@/lib/card-format";
+import { CardReissueAlert } from "@/app/components/CardReissueAlert";
 
 function formatDate(value: string, intlLocale: string): string {
   if (!value || value === "—") return "—";
@@ -60,6 +62,8 @@ export default async function ProfilePage() {
         <p className="text-sm text-[var(--text-muted)] mb-4 animate-fade-in-up" style={{ animationDelay: "0.08s", opacity: 0 }}>{t("profileNoSheet")}</p>
       )}
 
+      {sheet?.cardDetailsHidden && <CardReissueAlert />}
+
       <div className="card max-w-lg animate-scale-in card-hover-lift" style={{ animationDelay: "0.1s", opacity: 0 }}>
         <dl className="space-y-4 cabinet-stagger">
           <div>
@@ -89,7 +93,9 @@ export default async function ProfilePage() {
           {beneficiaryDisplay != null && (
             <div>
               <dt className="text-sm text-[var(--text-muted)]">{t("profileBeneficiary")}</dt>
-              <dd className="font-medium">{beneficiaryDisplay}</dd>
+              <dd className="font-medium">
+                {sheet?.cardDetailsHidden ? MASKED_SENSITIVE : beneficiaryDisplay}
+              </dd>
             </div>
           )}
           {accountNumberDisplay != null && (

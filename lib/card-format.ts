@@ -26,6 +26,8 @@ export function normalizeCardNumberFromSheet(raw: unknown): string {
 export const MASKED_CARD_NUMBER = "•••• •••• •••• ••••";
 export const MASKED_CARD_VALID = "••/••";
 export const MASKED_CARD_CVV = "•••";
+/** Бенефициар и др. чувствительные поля при скрытии до подтверждения перевыпуска */
+export const MASKED_SENSITIVE = "•••••••• •••• ••••";
 
 /** Группирует только цифры PAN по 4 — не трогает экспоненциальную запись как текст. */
 export function formatCardNumberForDisplay(num: string): string {
