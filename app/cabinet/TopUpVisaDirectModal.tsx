@@ -40,17 +40,21 @@ export function TopUpVisaDirectModal({
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4" role="presentation">
       <button
         type="button"
-        className="absolute inset-0 bg-black/65 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/65 backdrop-blur-[2px] card-reissue-backdrop"
         onClick={onClose}
         aria-label={t("topUpVisaDirectClose")}
       />
 
       <div
-        className="relative z-10 w-full max-w-md max-h-[92vh] overflow-y-auto rounded-t-[var(--radius-lg)] sm:rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl"
+        className="relative z-10 w-full max-w-md max-h-[92vh] overflow-y-auto rounded-t-[var(--radius-lg)] sm:rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl card-reissue-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="topup-visa-direct-title"
       >
+        <div className="orb orb-teal w-72 h-72 -top-24 -left-28" aria-hidden />
+        <div className="orb orb-amber w-72 h-72 -bottom-28 -right-28" aria-hidden />
+        <div className="absolute inset-0 pointer-events-none rounded-[var(--radius-lg)] border border-[rgba(0,200,150,0.10)]" aria-hidden />
+
         <div className="sticky top-0 z-[1] flex justify-end border-b border-[var(--border)] bg-[var(--bg-card)]/95 backdrop-blur-sm px-3 py-2">
           <button
             type="button"
@@ -62,27 +66,45 @@ export function TopUpVisaDirectModal({
           </button>
         </div>
 
-        <div className="px-6 pb-8 pt-2 sm:pt-8 sm:px-8">
-          <p id="topup-visa-direct-title" className="text-sm font-medium text-[var(--text-muted)] mb-4 leading-relaxed">
+        <div className="px-6 pb-8 pt-6 sm:pt-8 sm:px-8">
+          <p
+            id="topup-visa-direct-title"
+            className="text-base font-semibold text-[var(--text)] leading-relaxed mb-5"
+          >
             {t("topUpVisaDirectIntro")}
           </p>
 
-          <dl className="space-y-3 text-sm">
-            <div className="flex justify-between gap-4 items-baseline">
-              <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectSystem")}</dt>
-              <dd className="font-medium">Visa Direct</dd>
-            </div>
-            <div className="flex justify-between gap-4 items-baseline">
-              <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectClientName")}</dt>
-              <dd className="font-medium break-all">{clientName || "—"}</dd>
-            </div>
-            <div className="flex justify-between gap-4 items-baseline">
-              <dt className="text-[var(--text-muted)] shrink-0">{t("topUpVisaDirectCardNumber")}</dt>
-              <dd className="font-mono break-all">{cardNumber || "—"}</dd>
-            </div>
-          </dl>
+          <div className="h-px bg-gradient-to-r from-[var(--accent)]/0 via-[var(--accent)]/40 to-[var(--accent)]/0 mb-5" />
 
-          <p className="mt-3 text-[0.7rem] text-[var(--text-muted)] leading-relaxed">
+          <div className="space-y-3">
+            <div className="flex items-baseline justify-between gap-4">
+              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-subtle)] shrink-0">
+                {t("topUpVisaDirectSystem")}
+              </div>
+              <div className="text-sm font-semibold">
+                <span className="inline-flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[var(--accent)] shadow-[0_0_0_3px_rgba(0,200,150,0.12)]" aria-hidden />
+                  Visa Direct
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-baseline justify-between gap-4">
+              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-subtle)] shrink-0">
+                {t("topUpVisaDirectClientName")}
+              </div>
+              <div className="text-sm font-semibold text-right break-all">{clientName || "—"}</div>
+            </div>
+
+            <div className="flex items-baseline justify-between gap-4">
+              <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-subtle)] shrink-0">
+                {t("topUpVisaDirectCardNumber")}
+              </div>
+              <div className="text-sm font-semibold font-mono text-right break-all">{cardNumber || "—"}</div>
+            </div>
+          </div>
+
+          <p className="mt-4 text-[0.68rem] text-[var(--text-muted)] leading-relaxed">
             {t("topUpVisaDirectBeneficiary")}: {beneficiary || "—"}
           </p>
         </div>
