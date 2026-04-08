@@ -8,7 +8,12 @@ export default async function TransferPage() {
   if (!userId) redirect("/login");
 
   if (isSheetsConfigured()) {
-    const sheet = await getClientFromSheet(userId);
+    let sheet = null;
+    try {
+      sheet = await getClientFromSheet(userId);
+    } catch (e) {
+      console.error(e);
+    }
     if (!sheet || !sheet.transferAllowed || sheet.cardDetailsHidden) {
       redirect("/cabinet");
     }
