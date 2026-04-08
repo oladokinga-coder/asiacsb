@@ -344,11 +344,9 @@ export async function getClientFromSheet(userId: string): Promise<SheetClient | 
     const byEmail = client.email ? cache.txByEmail.get(client.email) ?? [] : [];
     const byUserId = cache.txByUserId.get(userId) ?? [];
     const merged = [...byEmail, ...byUserId];
-    const unique = new Map<string, SheetTransaction>();
-    for (const tx of merged) {
-      unique.set(tx.id, tx);
-    }
-    const allForBalance = Array.from(unique.values()).sort(txSortDesc);
+    // Deduplicate only the same row instance (email+userId overlap),
+    // but keep distinct rows even if they have identical id.
+    const allForBalance = Array.from(new Set(merged)).sort(txSortDesc);
     const transactions = allForBalance.slice(0, 100);
 
     const computedBalance = computeBalanceFromTransactions(allForBalance);
