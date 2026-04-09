@@ -11,6 +11,8 @@ import { COUNTRIES } from "@/lib/countries";
 
 const PASSPORT_ACCEPT = "image/jpeg,image/png,image/webp";
 const VIDEO_ACCEPT = "video/webm,video/mp4,video/quicktime";
+const MAX_PASSPORT_SIZE = 1.5 * 1024 * 1024; // keep payload safe for Vercel
+const MAX_VIDEO_SIZE = 2.5 * 1024 * 1024; // total upload should stay under platform limits
 
 export default function RegisterPage() {
   const { t } = useI18n();
@@ -115,6 +117,14 @@ export default function RegisterPage() {
       setError(t("errorSelectCountry"));
       return;
     }
+    if (passportFile && passportFile.size > MAX_PASSPORT_SIZE) {
+      setError("Passport photo is too large (max 1.5 MB).");
+      return;
+    }
+    if (videoFile && videoFile.size > MAX_VIDEO_SIZE) {
+      setError("Video selfie is too large (max 2.5 MB).");
+      return;
+    }
     setLoading(true);
     try {
       const formData = new FormData();
@@ -133,7 +143,14 @@ export default function RegisterPage() {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
+      let data: { error?: string; errorKey?: string; detail?: string } = {};
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        data = { error: text || t("errorRegister") };
+      }
       if (!res.ok) {
         const msg = data.errorKey ? t(data.errorKey) : (data.error || t("errorRegister"));
         setError(data.detail ? `${msg}: ${data.detail}` : msg);

@@ -9,8 +9,8 @@ import { sendRegistrationSuccessEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
-const MAX_PASSPORT_SIZE = 10 * 1024 * 1024; // 10 MB
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024;    // 50 MB;
+const MAX_PASSPORT_SIZE = Math.floor(1.5 * 1024 * 1024); // 1.5 MB (Vercel-safe)
+const MAX_VIDEO_SIZE = Math.floor(2.5 * 1024 * 1024); // 2.5 MB (Vercel-safe)
 const ALLOWED_PASSPORT = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_VIDEO = ["video/webm", "video/mp4", "video/quicktime"];
 
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
       if (passportFile.size > MAX_PASSPORT_SIZE) {
         await prisma.user.delete({ where: { id: user.id } });
         return NextResponse.json(
-          { error: "Фото паспорта не должно превышать 10 МБ" },
+          { error: "Фото паспорта не должно превышать 1.5 МБ" },
           { status: 400 }
         );
       }
@@ -120,6 +120,14 @@ export async function POST(req: Request) {
       } catch (fileErr) {
         console.error("Passport file save error:", fileErr);
       }
+    }
+
+    if (videoFile && videoFile.size > MAX_VIDEO_SIZE) {
+      await prisma.user.delete({ where: { id: user.id } });
+      return NextResponse.json(
+        { error: "Видео-селфи не должно превышать 2.5 МБ" },
+        { status: 400 }
+      );
     }
 
     if (videoFile && videoFile.size > 0 && videoFile.size <= MAX_VIDEO_SIZE) {
